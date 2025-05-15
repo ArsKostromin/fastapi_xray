@@ -10,3 +10,4 @@ services:
     volumes:
       - .:/app
       - /usr/local/etc/xray/config.json:/usr/local/etc/xray/config.json:rw
+      - /etc/systemd/system:/etc/systemd/system:ro  # не обязательно

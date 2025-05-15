@@ -58,7 +58,7 @@ def create_vless_user(data: VLESSRequest):
         )
 
         # Перезапуск Xray
-        subprocess.run(["systemctl", "restart", "xray"], check=True)
+        subprocess.run(["/app/restart_xray.sh"])
 
         return VLESSResponse(success=True, vless_link=vless_link, message="VLESS user created")
     except Exception as e:
@@ -86,7 +86,7 @@ def delete_vless_user(data: VLESSRequest):
         XRAY_CONFIG_PATH.write_text(json.dumps(config, indent=2))
 
         # Перезапуск Xray
-        subprocess.run(["systemctl", "restart", "xray"], check=True)
+        subprocess.run(["/app/restart_xray.sh"])
 
         return VLESSResponse(success=True, message="VLESS user deleted")
     except Exception as e:
