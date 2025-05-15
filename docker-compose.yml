@@ -10,5 +10,6 @@ services:
     volumes:
       - .:/app
       - /usr/local/etc/xray/config.json:/usr/local/etc/xray/config.json:rw
-      - /etc/systemd/system:/etc/systemd/system:ro  # не обязательно
+      - /etc/systemd/system:/etc/systemd/system:ro
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./restart_xray.sh:/app/restart_xray.sh:ro  # 👈 это важно
