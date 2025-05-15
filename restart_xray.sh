@@ -1,3 +1,4 @@
 #!/bin/bash
-echo "Restarting xray..."
-sudo systemctl restart xray
+
+# Простой перезапуск xray через docker
+docker restart xray
