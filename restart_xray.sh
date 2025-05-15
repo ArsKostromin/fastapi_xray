@@ -1,4 +1,3 @@
 #!/bin/bash
-
-# Простой перезапуск xray через docker
-docker restart xray
+echo "Restarting xray container..."
+docker restart fastapi-xray  # имя контейнера
