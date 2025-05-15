@@ -1,36 +1,41 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header, Depends
 from pydantic import BaseModel
-import uuid
-import json
 from pathlib import Path
 from datetime import datetime
+from uuid import UUID
+import json
 import socket
-import requests
-import subprocess
+import aiofiles
+import aiohttp
+import asyncio
 
 router = APIRouter()
 
-# Путь к config.json — предполагается, что он проброшен как volume
 XRAY_CONFIG_PATH = Path("/usr/local/etc/xray/config.json")
 CENTRAL_LOG_SERVER = "http://example.com/api/logs"
 
+
 class VLESSRequest(BaseModel):
     uuid: str
+
 
 class VLESSResponse(BaseModel):
     success: bool
     vless_link: str = ""
     message: str = ""
 
+
 @router.post("/vless", response_model=VLESSResponse)
-def create_vless_user(data: VLESSRequest):
+async def create_vless_user(data: VLESSRequest):
     try:
-        uid = str(uuid.UUID(data.uuid))  # validate UUID
+        uid = str(UUID(data.uuid))
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid UUID")
 
     try:
-        config = json.loads(XRAY_CONFIG_PATH.read_text())
+        async with aiofiles.open(XRAY_CONFIG_PATH, "r") as f:
+            config_data = await f.read()
+        config = json.loads(config_data)
         clients = config["inbounds"][0]["settings"]["clients"]
 
         if any(client["id"] == uid for client in clients):
@@ -41,13 +46,12 @@ def create_vless_user(data: VLESSRequest):
             "flow": "xtls-rprx-vision"
         })
 
-        XRAY_CONFIG_PATH.write_text(json.dumps(config, indent=2))
+        async with aiofiles.open(XRAY_CONFIG_PATH, "w") as f:
+            await f.write(json.dumps(config, indent=2))
 
-        # Генерация ссылки по шаблону
         short_id = config["inbounds"][0]["streamSettings"]["realitySettings"]["shortIds"][0]
-        server_name = config["inbounds"][0]["streamSettings"]["realitySettings"]["serverNames"][0]
         public_key = config["inbounds"][0]["streamSettings"]["realitySettings"]["publicKey"]
-        domain = "159.198.77.150"  # IP сервера
+        domain = "159.198.77.150"
         sni = "www.cloudflare.com"
 
         vless_link = (
@@ -57,8 +61,8 @@ def create_vless_user(data: VLESSRequest):
             f"&type=tcp&headerType=none#Reality-VLESS"
         )
 
-        # Перезапуск Xray
-        subprocess.run(["sudo", "systemctl", "restart", "xray"])
+        # Асинхронно перезапускаем xray
+        await asyncio.create_subprocess_exec("sudo", "systemctl", "restart", "xray")
 
         return VLESSResponse(success=True, vless_link=vless_link, message="VLESS user created")
     except Exception as e:
@@ -66,14 +70,16 @@ def create_vless_user(data: VLESSRequest):
 
 
 @router.delete("/vless", response_model=VLESSResponse)
-def delete_vless_user(data: VLESSRequest):
+async def delete_vless_user(data: VLESSRequest):
     try:
-        uid = str(uuid.UUID(data.uuid))
+        uid = str(UUID(data.uuid))
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid UUID")
 
     try:
-        config = json.loads(XRAY_CONFIG_PATH.read_text())
+        async with aiofiles.open(XRAY_CONFIG_PATH, "r") as f:
+            config_data = await f.read()
+        config = json.loads(config_data)
         clients = config["inbounds"][0]["settings"]["clients"]
         original_len = len(clients)
 
@@ -83,24 +89,26 @@ def delete_vless_user(data: VLESSRequest):
             return VLESSResponse(success=False, message="UUID not found")
 
         config["inbounds"][0]["settings"]["clients"] = clients
-        XRAY_CONFIG_PATH.write_text(json.dumps(config, indent=2))
+        async with aiofiles.open(XRAY_CONFIG_PATH, "w") as f:
+            await f.write(json.dumps(config, indent=2))
 
-        # Перезапуск Xray
-        subprocess.run(["sudo", "systemctl", "restart", "xray"])
+        await asyncio.create_subprocess_exec("sudo", "systemctl", "restart", "xray")
 
         return VLESSResponse(success=True, message="VLESS user deleted")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def send_logs():
+@router.post("/send-logs")
+async def send_logs():
     try:
         log_path = Path("/var/log/xray/access.log")
         if not log_path.exists():
-            return
+            return {"status": "no logs"}
 
-        with log_path.open() as f:
-            logs = f.readlines()[-100:]
+        async with aiofiles.open(log_path, "r") as f:
+            lines = await f.readlines()
+        logs = lines[-100:]
 
         ip = socket.gethostbyname(socket.gethostname())
         payload = {
@@ -109,7 +117,10 @@ def send_logs():
             "logs": logs,
         }
 
-        response = requests.post(CENTRAL_LOG_SERVER, json=payload)
-        response.raise_for_status()
+        async with aiohttp.ClientSession() as session:
+            async with session.post(CENTRAL_LOG_SERVER, json=payload) as resp:
+                if resp.status != 200:
+                    raise Exception(f"Failed to send logs, status: {resp.status}")
+        return {"status": "ok"}
     except Exception as e:
-        print(f"Failed to send logs: {e}")
+        return {"error": str(e)}
