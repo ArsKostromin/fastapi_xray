@@ -11,7 +11,7 @@ import subprocess
 router = APIRouter()
 
 # Путь к config.json — предполагается, что он проброшен как volume
-XRAY_CONFIG_PATH = Path(__file__).parent / "config.json"
+XRAY_CONFIG_PATH = Path("/usr/local/etc/xray/config.json")
 CENTRAL_LOG_SERVER = "http://example.com/api/logs"
 
 class VLESSRequest(BaseModel):
