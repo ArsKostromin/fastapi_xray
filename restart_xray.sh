@@ -1,3 +1,3 @@
 #!/bin/bash
-echo "Restarting xray container..."
-docker restart fastapi-xray  # имя контейнера
+echo "[+] Перезапускаем Xray через systemctl..."
+sudo systemctl restart xray
