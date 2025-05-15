@@ -6,10 +6,12 @@ from pathlib import Path
 from datetime import datetime
 import socket
 import requests
+import subprocess
 
 router = APIRouter()
 
-XRAY_CONFIG_PATH = Path("/usr/local/etc/xray/config.json")
+# Путь к config.json — предполагается, что он проброшен как volume
+XRAY_CONFIG_PATH = Path("/etc/xray/config.json")
 CENTRAL_LOG_SERVER = "http://example.com/api/logs"
 
 class VLESSRequest(BaseModel):
@@ -41,24 +43,64 @@ def create_vless_user(data: VLESSRequest):
 
         XRAY_CONFIG_PATH.write_text(json.dumps(config, indent=2))
 
+        # Генерация ссылки по шаблону
         short_id = config["inbounds"][0]["streamSettings"]["realitySettings"]["shortIds"][0]
         server_name = config["inbounds"][0]["streamSettings"]["realitySettings"]["serverNames"][0]
-        domain = server_name
-        vless_link = f"vless://{uid}@{domain}:443?type=tcp&security=reality&encryption=none&flow=xtls-rprx-vision&fp=chrome&pbk={config['inbounds'][0]['streamSettings']['realitySettings']['privateKey']}&sid={short_id}&sni={server_name}#{uid}"
+        public_key = config["inbounds"][0]["streamSettings"]["realitySettings"]["publicKey"]
+        domain = "159.198.77.150"  # IP сервера
+        sni = "www.cloudflare.com"
+
+        vless_link = (
+            f"vless://{uid}@{domain}:443"
+            f"?encryption=none&flow=xtls-rprx-vision&security=reality"
+            f"&sni={sni}&fp=chrome&pbk={public_key}&sid={short_id}"
+            f"&type=tcp&headerType=none#Reality-VLESS"
+        )
+
+        # Перезапуск Xray
+        subprocess.run(["systemctl", "restart", "xray"], check=True)
 
         return VLESSResponse(success=True, vless_link=vless_link, message="VLESS user created")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.delete("/vless", response_model=VLESSResponse)
+def delete_vless_user(data: VLESSRequest):
+    try:
+        uid = str(uuid.UUID(data.uuid))
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid UUID")
+
+    try:
+        config = json.loads(XRAY_CONFIG_PATH.read_text())
+        clients = config["inbounds"][0]["settings"]["clients"]
+        original_len = len(clients)
+
+        clients = [client for client in clients if client["id"] != uid]
+
+        if len(clients) == original_len:
+            return VLESSResponse(success=False, message="UUID not found")
+
+        config["inbounds"][0]["settings"]["clients"] = clients
+        XRAY_CONFIG_PATH.write_text(json.dumps(config, indent=2))
+
+        # Перезапуск Xray
+        subprocess.run(["systemctl", "restart", "xray"], check=True)
+
+        return VLESSResponse(success=True, message="VLESS user deleted")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 def send_logs():
     try:
-        log_path = Path("/var/log/xray/access.log")  # заменить, если другой путь
+        log_path = Path("/var/log/xray/access.log")
         if not log_path.exists():
             return
 
         with log_path.open() as f:
-            logs = f.readlines()[-100:]  # последние 100 строк
+            logs = f.readlines()[-100:]
 
         ip = socket.gethostbyname(socket.gethostname())
         payload = {
