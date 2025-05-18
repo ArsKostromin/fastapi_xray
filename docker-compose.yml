@@ -13,3 +13,4 @@ services:
       - /etc/systemd/system:/etc/systemd/system:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - ./restart_xray.sh:/app/restart_xray.sh:rw
+      - /var/log/squid/access.log:/var/log/squid/access.log:ro
