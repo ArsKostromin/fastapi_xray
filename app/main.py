@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.api.v1 import xray
-from log_watcher import tailer  # используем общий экземпляр
+from api.v1.log_watcher import tailer  # используем общий экземпляр
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Xray FastAPI Service")
