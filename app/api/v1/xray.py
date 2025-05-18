@@ -61,7 +61,7 @@ async def create_vless_user(data: VLESSRequest):
         )
 
         # Перезапуск Xray
-        await asyncio.create_subprocess_exec("sudo", "systemctl", "restart", "xray")
+        await asyncio.create_subprocess_exec("supervisorctl", "restart", "xray")
 
         return VLESSResponse(success=True, vless_link=vless_link, message="VLESS user created")
 
@@ -96,7 +96,7 @@ async def delete_vless_user(data: VLESSRequest):
         async with aiofiles.open(XRAY_CONFIG_PATH, "w") as f:
             await f.write(json.dumps(config, indent=2))
 
-        await asyncio.create_subprocess_exec("sudo", "systemctl", "restart", "xray")
+        await asyncio.create_subprocess_exec("supervisorctl", "restart", "xray")
 
         return VLESSResponse(success=True, message="VLESS user deleted")
 
