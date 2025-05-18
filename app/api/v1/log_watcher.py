@@ -20,8 +20,6 @@ class LogTailer:
             print("Log file doesn't exist:", LOG_PATH)
             return
 
-        hostname = socket.gethostname()
-
         async with aiohttp.ClientSession() as session:
             with open(LOG_PATH, "r") as f:
                 f.seek(0, 2)  # jump to end
@@ -31,27 +29,36 @@ class LogTailer:
                         await asyncio.sleep(0.5)
                         continue
 
-                    # Пример строки: 1747585954.066  59099 81.162.252.10 NONE/503 0 CONNECT 141.8.199.52:7070 - HIER_NONE/- -
                     parts = line.strip().split()
-                    if len(parts) < 7:
+                    if len(parts) < 5:
                         continue
 
-                    client_ip = parts[2]
-                    destination = parts[6]
-                    email = parts[7] if len(parts) > 7 and "@" in parts[7] else None
+                    # Парсим поля
+                    try:
+                        timestamp_unix = float(parts[0])
+                        timestamp = datetime.utcfromtimestamp(timestamp_unix).isoformat()
+                        client_ip = parts[2]
+                        status_code = parts[3].split("/")[1] if "/" in parts[3] else None
+                        bytes_sent = int(parts[4])
+                        destination = parts[6] if len(parts) > 6 else None
+                        email = parts[7] if len(parts) > 7 and "@" in parts[7] else None
+                    except Exception as e:
+                        print(f"Parse error: {e}")
+                        continue
 
                     payload = {
                         "uuid": email or "unknown",
                         "ip": client_ip,
-                        "host": hostname,
                         "destination": destination,
                         "raw_log": line.strip(),
-                        "timestamp": datetime.utcnow().isoformat()
+                        "timestamp": timestamp,
+                        "status": status_code,
+                        "bytes_sent": bytes_sent,
                     }
 
                     try:
                         async with session.post(CENTRAL_LOG_SERVER, json=payload) as resp:
-                            if resp.status != 200:
+                            if resp.status != 201:
                                 print(f"Failed to send log: {resp.status}")
                     except Exception as e:
                         print(f"Error sending log: {e}")
@@ -65,5 +72,4 @@ class LogTailer:
         if self.task:
             self.task.cancel()
 
-# Важно: создаём один tailer на весь проект
 tailer = LogTailer()
