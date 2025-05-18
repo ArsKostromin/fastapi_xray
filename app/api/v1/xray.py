@@ -29,7 +29,7 @@ async def add_user_to_htpasswd(user: str, password: str):
     """Добавляет или обновляет пользователя в htpasswd"""
     try:
         result = subprocess.run(
-            ["htpasswd", "-bB", SQUID_PASSWD_FILE, user, password],
+            ["htpasswd", "-bB", str(SQUID_PASSWD_FILE), user, password],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -54,7 +54,8 @@ async def create_vless_user(data: VLESSRequest):
 
         clients = config["inbounds"][0]["settings"]["clients"]
         outbounds = config.get("outbounds", [])
-        routing_rules = config.get("routing", {}).get("rules", [])
+        routing = config.get("routing", {})
+        routing_rules = routing.get("rules", [])
 
         if any(client["id"] == uid for client in clients):
             return VLESSResponse(success=False, message="UUID already exists")
@@ -99,10 +100,10 @@ async def create_vless_user(data: VLESSRequest):
         }
         routing_rules.append(new_rule)
 
-        # Сохраняем обновлённый конфиг
+        # Обновляем конфиг
         config["outbounds"] = outbounds
-        if "routing" not in config:
-            config["routing"] = {"domainStrategy": "AsIs", "rules": []}
+        config["routing"] = routing
+        config["routing"]["domainStrategy"] = routing.get("domainStrategy", "AsIs")
         config["routing"]["rules"] = routing_rules
 
         async with aiofiles.open(XRAY_CONFIG_PATH, "w") as f:
@@ -128,6 +129,7 @@ async def create_vless_user(data: VLESSRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @router.delete("/vless", response_model=VLESSResponse)
