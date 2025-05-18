@@ -6,7 +6,7 @@ from pathlib import Path
 from datetime import datetime
 
 LOG_PATH = "/var/log/squid/access.log"
-CENTRAL_LOG_SERVER = "https://server2.anonixvpn.space/api/v1/proxylog/"  # Django endpoint
+CENTRAL_LOG_SERVER = "https://server2.anonixvpn.space/proxylogs/receive-log/"
 
 class LogTailer:
     def __init__(self):
