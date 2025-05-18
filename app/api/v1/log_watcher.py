@@ -1,7 +1,5 @@
-# log_watcher.py
 import asyncio
 import aiohttp
-import socket
 from pathlib import Path
 from datetime import datetime
 
@@ -30,38 +28,43 @@ class LogTailer:
                         continue
 
                     parts = line.strip().split()
-                    if len(parts) < 5:
+                    if len(parts) < 6:
                         continue
 
-                    # Парсим поля
                     try:
                         timestamp_unix = float(parts[0])
                         timestamp = datetime.utcfromtimestamp(timestamp_unix).isoformat()
-                        client_ip = parts[2]
-                        status_code = parts[3].split("/")[1] if "/" in parts[3] else None
-                        bytes_sent = int(parts[4])
-                        destination = parts[6] if len(parts) > 6 else None
-                        email = parts[7] if len(parts) > 7 and "@" in parts[7] else None
-                    except Exception as e:
-                        print(f"Parse error: {e}")
-                        continue
+                        client_ip = parts[1]
+                        uuid = parts[2]
+                        method = parts[3]
+                        host_port = parts[4]
 
-                    payload = {
-                        "uuid": email or "unknown",
-                        "ip": client_ip,
-                        "destination": destination,
-                        "raw_log": line.strip(),
-                        "timestamp": timestamp,
-                        "status": status_code,
-                        "bytes_sent": bytes_sent,
-                    }
+                        # Разделяем host:port
+                        if ':' in host_port:
+                            host, port_str = host_port.split(":", 1)
+                            port = int(port_str)
+                        else:
+                            host = host_port
+                            port = None
 
-                    try:
+                        status_code = parts[5]
+
+                        payload = {
+                            "uuid": uuid,
+                            "ip": client_ip,
+                            "destination": f"{host}:{port}" if port else host,
+                            "raw_log": line.strip(),
+                            "timestamp": timestamp,
+                            "status": status_code,
+                            "bytes_sent": None  # нет в твоем формате
+                        }
+
                         async with session.post(CENTRAL_LOG_SERVER, json=payload) as resp:
                             if resp.status != 201:
                                 print(f"Failed to send log: {resp.status}")
                     except Exception as e:
-                        print(f"Error sending log: {e}")
+                        print(f"Parse error: {e}")
+                        continue
 
     def start(self):
         if not self.task:
