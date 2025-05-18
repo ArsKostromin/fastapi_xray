@@ -97,30 +97,3 @@ async def delete_vless_user(data: VLESSRequest):
         return VLESSResponse(success=True, message="VLESS user deleted")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/send-logs")
-async def send_logs():
-    try:
-        log_path = Path("/var/log/xray/access.log")
-        if not log_path.exists():
-            return {"status": "no logs"}
-
-        async with aiofiles.open(log_path, "r") as f:
-            lines = await f.readlines()
-        logs = lines[-100:]
-
-        ip = socket.gethostbyname(socket.gethostname())
-        payload = {
-            "ip": ip,
-            "timestamp": datetime.utcnow().isoformat(),
-            "logs": logs,
-        }
-
-        async with aiohttp.ClientSession() as session:
-            async with session.post(CENTRAL_LOG_SERVER, json=payload) as resp:
-                if resp.status != 200:
-                    raise Exception(f"Failed to send logs, status: {resp.status}")
-        return {"status": "ok"}
-    except Exception as e:
-        return {"error": str(e)}
