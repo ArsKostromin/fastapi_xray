@@ -12,10 +12,11 @@ class LogTailer:
         self.running = False
 
     async def tail_log(self):
+        print("🚀 tail_log запущен")
         self.running = True
         path = Path(LOG_PATH)
         if not path.exists():
-            print("Log file doesn't exist:", LOG_PATH)
+            print("❌ Log file doesn't exist:", LOG_PATH)
             return
 
         async with aiohttp.ClientSession() as session:
@@ -39,7 +40,6 @@ class LogTailer:
                         method = parts[3]
                         host_port = parts[4]
 
-                        # Разделяем host:port
                         if ':' in host_port:
                             host, port_str = host_port.split(":", 1)
                             port = int(port_str)
@@ -56,17 +56,18 @@ class LogTailer:
                             "raw_log": line.strip(),
                             "timestamp": timestamp,
                             "status": status_code,
-                            "bytes_sent": None  # нет в твоем формате
+                            "bytes_sent": None
                         }
 
+                        print(f"📤 Отправляем: {payload}")
                         async with session.post(CENTRAL_LOG_SERVER, json=payload) as resp:
                             if resp.status != 201:
-                                print(f"Failed to send log: {resp.status}")
+                                print(f"❗️Failed to send log: {resp.status}")
                     except Exception as e:
-                        print(f"Parse error: {e}")
+                        print(f"⚠️ Parse error: {e}")
                         continue
 
-    def start(self):
+    async def start(self):
         if not self.task:
             self.task = asyncio.create_task(self.tail_log())
 
