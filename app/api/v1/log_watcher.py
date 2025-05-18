@@ -1,10 +1,12 @@
+# log_watcher.py
 import asyncio
 import aiohttp
+import socket
 from pathlib import Path
 from datetime import datetime
 
 LOG_PATH = "/var/log/squid/access.log"
-CENTRAL_LOG_SERVER = "https://server2.anonixvpn.space/proxylogs/receive-log/"
+CENTRAL_LOG_SERVER = "https://server2.anonixvpn.space/api/v1/proxylog/"  # Django endpoint
 
 class LogTailer:
     def __init__(self):
@@ -18,6 +20,8 @@ class LogTailer:
             print("Log file doesn't exist:", LOG_PATH)
             return
 
+        hostname = socket.gethostname()
+
         async with aiohttp.ClientSession() as session:
             with open(LOG_PATH, "r") as f:
                 f.seek(0, 2)  # jump to end
@@ -27,11 +31,24 @@ class LogTailer:
                         await asyncio.sleep(0.5)
                         continue
 
+                    # Пример строки: 1747585954.066  59099 81.162.252.10 NONE/503 0 CONNECT 141.8.199.52:7070 - HIER_NONE/- -
+                    parts = line.strip().split()
+                    if len(parts) < 7:
+                        continue
+
+                    client_ip = parts[2]
+                    destination = parts[6]
+                    email = parts[7] if len(parts) > 7 and "@" in parts[7] else None
+
                     payload = {
-                        "ip": "squid-box",  # или socket.gethostname()
-                        "timestamp": datetime.utcnow().isoformat(),
-                        "log": line.strip()
+                        "uuid": email or "unknown",
+                        "ip": client_ip,
+                        "host": hostname,
+                        "destination": destination,
+                        "raw_log": line.strip(),
+                        "timestamp": datetime.utcnow().isoformat()
                     }
+
                     try:
                         async with session.post(CENTRAL_LOG_SERVER, json=payload) as resp:
                             if resp.status != 200:
