@@ -1,157 +1,136 @@
 import asyncio
 import aiohttp
+import re
+from datetime import datetime
 from pathlib import Path
-from datetime import datetime, timedelta
 
 SQUID_LOG_PATH = "/var/log/squid/access.log"
 XRAY_LOG_PATH = "/var/log/xray/access.log"
 CENTRAL_LOG_SERVER = "https://server2.anonixvpn.space/proxylogs/receive-log/"
 
-xray_cache = {}
-
-class LogTailer:
+class XraySquidLogTailer:
     def __init__(self):
-        self.running = False
         self.task = None
-
-    async def start(self):
-        if not self.task:
-            self.running = True
-            self.task = asyncio.create_task(self.tail_logs())
-            print("🚀 LogTailer запущен")
+        self.running = False
+        self.xray_entries = []  # Список словарей с time+uuid из xray
 
     def stop(self):
         self.running = False
         if self.task:
             self.task.cancel()
-            self.task = None
-            print("🛑 LogTailer остановлен")
 
-    async def tail_logs(self):
-        print("📄 tail_logs запущен")
-        squid_path = Path(SQUID_LOG_PATH)
-        xray_path = Path(XRAY_LOG_PATH)
-
-        if not squid_path.exists() or not xray_path.exists():
-            print("❌ Логи не найдены.")
+    async def parse_xray_log(self):
+        """
+        Парсит Xray access.log и сохраняет UUID и timestamp (unix) в список
+        """
+        print("📦 Запущен парсер Xray access.log")
+        path = Path(XRAY_LOG_PATH)
+        if not path.exists():
+            print("❌ Xray лог не найден:", XRAY_LOG_PATH)
             return
 
-        squid_file = open(squid_path, "r")
-        xray_file = open(xray_path, "r")
+        with open(XRAY_LOG_PATH, "r") as f:
+            f.seek(0, 2)  # Конец файла
+            while self.running:
+                line = f.readline()
+                if not line:
+                    await asyncio.sleep(0.5)
+                    continue
 
-        squid_file.seek(0, 2)
-        xray_file.seek(0, 2)
+                match = re.search(r"(\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}).*email: ([a-f0-9\-]+)", line)
+                if match:
+                    timestamp_str = match.group(1)
+                    uuid = match.group(2)
+                    try:
+                        dt = datetime.strptime(timestamp_str, "%Y/%m/%d %H:%M:%S")
+                        timestamp_unix = dt.timestamp()
+                        self.xray_entries.append({
+                            "timestamp": timestamp_unix,
+                            "uuid": uuid
+                        })
+                        if len(self.xray_entries) > 1000:
+                            self.xray_entries = self.xray_entries[-1000:]  # Очистка старых
+                    except Exception as e:
+                        print(f"⚠️ Ошибка обработки Xray лога: {e}")
+
+    def find_uuid_by_timestamp(self, squid_ts):
+        # Находит ближайший по времени UUID
+        closest = None
+        min_diff = float('inf')
+        for entry in self.xray_entries:
+            diff = abs(entry['timestamp'] - squid_ts)
+            if diff < min_diff:
+                min_diff = diff
+                closest = entry
+        return closest['uuid'] if closest else None
+
+    async def tail_squid_log(self):
+        print("🚀 Запущен парсер Squid access.log")
+        path = Path(SQUID_LOG_PATH)
+        if not path.exists():
+            print("❌ Squid лог не найден:", SQUID_LOG_PATH)
+            return
 
         async with aiohttp.ClientSession() as session:
-            while self.running:
-                squid_line = squid_file.readline()
-                xray_line = xray_file.readline()
+            with open(SQUID_LOG_PATH, "r") as f:
+                f.seek(0, 2)
+                while self.running:
+                    line = f.readline()
+                    if not line:
+                        await asyncio.sleep(0.5)
+                        continue
 
-                if xray_line:
-                    self._parse_xray_line(xray_line)
+                    parts = line.strip().split()
+                    if len(parts) < 6:
+                        continue
 
-                if squid_line:
-                    squid_event = self._parse_squid_line(squid_line)
-                    if squid_event:
-                        matched_email = self._match_squid_with_xray(squid_event)
-                        if matched_email:
-                            squid_event["email"] = matched_email
-                            await self._send_to_server(session, squid_event)
+                    try:
+                        timestamp_unix = float(parts[0])
+                        timestamp = datetime.utcfromtimestamp(timestamp_unix).isoformat()
+                        client_ip = parts[1]
+                        method = parts[3]
+                        host_port = parts[4]
+                        status_code = parts[5]
+
+                        if ':' in host_port:
+                            host, port_str = host_port.split(":", 1)
+                            port = int(port_str)
                         else:
-                            print(f"⚠️ Не найдено соответствие: {squid_event}")
-                else:
-                    await asyncio.sleep(0.3)
+                            host = host_port
+                            port = None
 
-    def _parse_xray_line(self, line: str):
-        if "accepted" not in line:
-            return
-        try:
-            parts = line.strip().split()
-            timestamp_str = " ".join(parts[0:2])
-            timestamp = datetime.strptime(timestamp_str, "%Y/%m/%d %H:%M:%S.%f")
+                        # ищем UUID по таймстемпу
+                        uuid = self.find_uuid_by_timestamp(timestamp_unix)
+                        if not uuid:
+                            print("⚠️ UUID не найден по таймстемпу", timestamp_unix)
+                            continue
 
-            ip_port = parts[3]
-            ip = ip_port.split(":")[0]
+                        payload = {
+                            "uuid": uuid,
+                            "ip": client_ip,
+                            "destination": f"{host}:{port}" if port else host,
+                            "raw_log": line.strip(),
+                            "timestamp": timestamp,
+                            "status": status_code,
+                            "bytes_sent": None
+                        }
 
-            email = None
-            for part in parts:
-                if part.startswith("email:"):
-                    email = part.split("email:")[1]
-                    break
+                        print(f"📤 Отправляем лог: {payload}")
+                        async with session.post(CENTRAL_LOG_SERVER, json=payload) as resp:
+                            if resp.status != 201:
+                                print(f"❗️Ошибка отправки: {resp.status}")
+                    except Exception as e:
+                        print(f"⚠️ Ошибка парсинга: {e}")
 
-            if not email:
-                return
+    async def tail_log(self):
+        self.running = True
+        await asyncio.gather(
+            self.parse_xray_log(),
+            self.tail_squid_log()
+        )
 
-            xray_cache[ip] = {
-                "email": email,
-                "timestamp": timestamp
-            }
-
-        except Exception as e:
-            print(f"❌ Ошибка XRAY: {e}")
-
-    def _parse_squid_line(self, line: str):
-        try:
-            parts = line.strip().split()
-            if len(parts) < 6:
-                return None
-
-            timestamp_unix = float(parts[0])
-            timestamp = datetime.utcfromtimestamp(timestamp_unix)
-            client_ip = parts[1]
-            uuid = parts[2]
-            method = parts[3]
-            host_port = parts[4]
-            status_code = parts[5]
-
-            host, port = None, None
-            if ":" in host_port:
-                host, port_str = host_port.split(":", 1)
-                port = int(port_str)
-
-            return {
-                "timestamp": timestamp,
-                "client_ip": client_ip,
-                "uuid": uuid,
-                "method": method,
-                "host": host,
-                "port": port,
-                "status": status_code,
-            }
-        except Exception as e:
-            print(f"❌ Ошибка Squid: {e}")
-            return None
-
-    def _match_squid_with_xray(self, squid_event):
-        ip = squid_event["client_ip"]
-        squid_time = squid_event["timestamp"]
-
-        if ip in xray_cache:
-            xray_event = xray_cache[ip]
-            xray_time = xray_event["timestamp"]
-            delta = abs((squid_time - xray_time).total_seconds())
-            if delta <= 2:
-                return xray_event["email"]
-
-        return None
-
-    async def _send_to_server(self, session, data):
-        try:
-            payload = {
-                "timestamp": data["timestamp"].isoformat(),
-                "uuid": data["uuid"],
-                "email": data.get("email"),
-                "ip": data["client_ip"],
-                "method": data["method"],
-                "host": data["host"],
-                "port": data["port"],
-                "status": data["status"],
-            }
-
-            async with session.post(CENTRAL_LOG_SERVER, json=payload) as resp:
-                if resp.status == 200:
-                    print(f"✅ Лог отправлен: {payload}")
-                else:
-                    print(f"❌ Ошибка отправки: {resp.status}")
-        except Exception as e:
-            print(f"❌ Ошибка запроса: {e}")
+    async def start(self):
+        if not self.task:
+            self.task = asyncio.create_task(self.tail_log())
+            
+tailer = XraySquidLogTailer()
