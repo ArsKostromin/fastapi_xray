@@ -12,7 +12,7 @@ class XraySquidLogTailer:
     def __init__(self):
         self.task = None
         self.running = False
-        self.xray_entries = []  # Список словарей с time+uuid из xray
+        self.xray_entries = []  # [{timestamp, uuid, ip}]
 
     def stop(self):
         self.running = False
@@ -20,9 +20,6 @@ class XraySquidLogTailer:
             self.task.cancel()
 
     async def parse_xray_log(self):
-        """
-        Парсит Xray access.log и сохраняет UUID и timestamp (unix) в список
-        """
         print("📦 Запущен парсер Xray access.log")
         path = Path(XRAY_LOG_PATH)
         if not path.exists():
@@ -30,31 +27,35 @@ class XraySquidLogTailer:
             return
 
         with open(XRAY_LOG_PATH, "r") as f:
-            f.seek(0, 2)  # Конец файла
+            f.seek(0, 2)
             while self.running:
                 line = f.readline()
                 if not line:
                     await asyncio.sleep(0.5)
                     continue
 
-                match = re.search(r"(\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}).*email: ([a-f0-9\-]+)", line)
+                # Пример строки:
+                # 2025/05/19 13:02:27.356636 from 185.2.104.104:2036 accepted tcp:host.com:80 [tag -> user-xxx] email: uuid
+                match = re.search(
+                    r"(\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2})\.?\d*\s+from\s+([\d\.]+):\d+.*email:\s+([a-f0-9\-]+)",
+                    line
+                )
                 if match:
-                    timestamp_str = match.group(1)
-                    uuid = match.group(2)
+                    timestamp_str, ip, uuid = match.groups()
                     try:
                         dt = datetime.strptime(timestamp_str, "%Y/%m/%d %H:%M:%S")
                         timestamp_unix = dt.timestamp()
                         self.xray_entries.append({
                             "timestamp": timestamp_unix,
-                            "uuid": uuid
+                            "uuid": uuid,
+                            "ip": ip
                         })
                         if len(self.xray_entries) > 1000:
-                            self.xray_entries = self.xray_entries[-1000:]  # Очистка старых
+                            self.xray_entries = self.xray_entries[-1000:]
                     except Exception as e:
                         print(f"⚠️ Ошибка обработки Xray лога: {e}")
 
-    def find_uuid_by_timestamp(self, squid_ts):
-        # Находит ближайший по времени UUID
+    def find_entry_by_timestamp(self, squid_ts):
         closest = None
         min_diff = float('inf')
         for entry in self.xray_entries:
@@ -62,7 +63,7 @@ class XraySquidLogTailer:
             if diff < min_diff:
                 min_diff = diff
                 closest = entry
-        return closest['uuid'] if closest else None
+        return closest
 
     async def tail_squid_log(self):
         print("🚀 Запущен парсер Squid access.log")
@@ -87,7 +88,6 @@ class XraySquidLogTailer:
                     try:
                         timestamp_unix = float(parts[0])
                         timestamp = datetime.utcfromtimestamp(timestamp_unix).isoformat()
-                        client_ip = parts[1]
                         method = parts[3]
                         host_port = parts[4]
                         status_code = parts[5]
@@ -99,15 +99,14 @@ class XraySquidLogTailer:
                             host = host_port
                             port = None
 
-                        # ищем UUID по таймстемпу
-                        uuid = self.find_uuid_by_timestamp(timestamp_unix)
-                        if not uuid:
-                            print("⚠️ UUID не найден по таймстемпу", timestamp_unix)
+                        entry = self.find_entry_by_timestamp(timestamp_unix)
+                        if not entry:
+                            print("⚠️ UUID и IP не найдены по таймстемпу", timestamp_unix)
                             continue
 
                         payload = {
-                            "uuid": uuid,
-                            "ip": client_ip,
+                            "uuid": entry["uuid"],
+                            "ip": entry["ip"],
                             "destination": f"{host}:{port}" if port else host,
                             "raw_log": line.strip(),
                             "timestamp": timestamp,
@@ -132,5 +131,5 @@ class XraySquidLogTailer:
     async def start(self):
         if not self.task:
             self.task = asyncio.create_task(self.tail_log())
-            
+
 tailer = XraySquidLogTailer()
