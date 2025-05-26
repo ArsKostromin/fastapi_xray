@@ -121,7 +121,7 @@ async def create_vless_user(data: VLESSRequest):
 
         vless_link = (
             f"vless://{uid}@{domain}:{port}"
-            f"?encryption=none&type=ws&security=none&path={path}#AnonVPN"
+            f"?encryption=none&type=ws&security=none&path={path}#America"
         )
 
         return VLESSResponse(success=True, vless_link=vless_link, message="VLESS user created")
