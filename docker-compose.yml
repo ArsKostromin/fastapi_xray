@@ -29,11 +29,13 @@ services:
     ports:
       - "8081:8081"
     volumes:
-      - ./app:/app/app             # <== Монтируем app в контейнер
+      - ./app:/app/app
       - ./restart_xray.sh:/app/restart_xray.sh:rw
       - /usr/local/etc/xray/config.json:/usr/local/etc/xray/config.json:rw
       - /etc/systemd/system:/etc/systemd/system:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/log/squid/access.log:/var/log/squid/access.log:ro
+      - /var/log/xray/access.log:/var/log/xray/access.log:ro
+      - /var/log/xray/error.log:/var/log/xray/error.log:ro
     environment:
       - PYTHONUNBUFFERED=1
