@@ -23,18 +23,17 @@ services:
 
   fastapi:
     build:
-      context: .
+      context: ./fastapi
     container_name: fastapi
     restart: unless-stopped
     ports:
       - "8081:8081"
     volumes:
       - ./fastapi:/app
-      - .:/app
+      - ./restart_xray.sh:/app/restart_xray.sh:rw
       - /usr/local/etc/xray/config.json:/usr/local/etc/xray/config.json:rw
       - /etc/systemd/system:/etc/systemd/system:ro
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./restart_xray.sh:/app/restart_xray.sh:rw
       - /var/log/squid/access.log:/var/log/squid/access.log:ro
     environment:
       - PYTHONUNBUFFERED=1
