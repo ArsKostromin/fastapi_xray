@@ -11,4 +11,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 RUN chmod +x /app/restart_xray.sh
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8081", "--reload", "--app-dir", "/app"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8081", "--reload", "--app-dir", "/app"]
