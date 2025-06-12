@@ -1,17 +1,40 @@
 version: "3.9"
 
 services:
-  fastapi:
-    build: .
-    container_name: fastapi-xray
-    ports:
-      - "8000:8000"
+  xray:
+    image: teddysun/xray
+    container_name: xray
     restart: unless-stopped
     volumes:
+      - ./xray/config.json:/etc/xray/config.json:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/log/xray:/var/log/xray
+    network_mode: host
+
+  squid:
+    image: ubuntu/squid
+    container_name: squid
+    restart: unless-stopped
+    volumes:
+      - ./squid/squid.conf:/etc/squid/squid.conf:ro
+      - ./squid/passwd:/etc/squid/passwd:ro
+      - /var/log/squid:/var/log/squid
+    network_mode: host
+
+  fastapi:
+    build:
+      context: ./fastapi
+    container_name: fastapi
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./fastapi:/app
       - .:/app
       - /usr/local/etc/xray/config.json:/usr/local/etc/xray/config.json:rw
       - /etc/systemd/system:/etc/systemd/system:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - ./restart_xray.sh:/app/restart_xray.sh:rw
       - /var/log/squid/access.log:/var/log/squid/access.log:ro
-      
+    environment:
+      - PYTHONUNBUFFERED=1

@@ -1,0 +1,117 @@
+{
+  "log": {
+    "loglevel": "debug",
+    "access": "/var/log/xray/access.log",
+    "error": "/var/log/xray/error.log"
+  },
+  "inbounds": [
+    {
+      "port": 443,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
+            "level": 0,
+            "email": "74b741f9-ea44-4f16-8599-90bcc31ae3cc"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "certificates": [
+            {
+              "certificateFile": "/etc/letsencrypt/live/indonesia.server2.anonixvpn.space/fullchain.pem",
+              "keyFile": "/etc/letsencrypt/live/indonesia.server2.anonixvpn.space/privkey.pem"
+            }
+          ]
+        },
+        "wsSettings": {
+          "path": "/ws",
+          "headers": {
+            "Host": "indonesia.server2.anonixvpn.space"
+          }
+        }
+      },
+      "tag": "vless-in",
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"]
+      }
+    },
+    {
+      "port": 10808,
+      "listen": "127.0.0.1",
+      "protocol": "socks",
+      "settings": {
+        "auth": "noauth",
+        "udp": true
+      },
+      "tag": "socks-in"
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "http",
+      "settings": {
+        "servers": [
+          {
+            "address": "127.0.0.1",
+            "port": 8888,
+            "users": [
+              {
+                "user": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
+                "pass": "x",
+                "auth": "basic"
+              }
+            ]
+          }
+        ]
+      },
+      "tag": "user-74b741"
+    },
+    {
+      "protocol": "dns",
+      "tag": "dns-out"
+    },
+    {
+      "protocol": "freedom",
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "blocked"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "outboundTag": "dns-out",
+        "network": "udp",
+        "port": 53
+      },
+      {
+        "type": "field",
+        "inboundTag": ["vless-in"],
+        "email": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
+        "outboundTag": "user-74b741"
+      },
+      {
+        "type": "field",
+        "inboundTag": ["vless-in"],
+        "ip": ["0.0.0.0/0", "::/0"],
+        "outboundTag": "user-74b741"
+      },
+      {
+        "type": "field",
+        "inboundTag": ["socks-in"],
+        "outboundTag": "user-74b741"
+      }
+    ]
+  }
+}
