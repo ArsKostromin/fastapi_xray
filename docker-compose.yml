@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./squid/squid.conf:/etc/squid/squid.conf:ro
-      - ./squid/passwd:/etc/squid/passwd
+      - ./squid/passwd:/etc/squid/passwd:ro
       - /var/log/squid:/var/log/squid
     network_mode: host
 
