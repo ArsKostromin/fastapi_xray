@@ -96,7 +96,7 @@ async def create_vless_user(data: VLESSRequest):
         logger.info(f"Клиент {uid} добавлен")
 
         # Добавляем outbound
-        outbound_tag = f"user-{uid[:6]}"
+        outbound_tag = f"user-{uid}"
         new_outbound = {
             "protocol": "http",
             "settings": {
@@ -116,6 +116,13 @@ async def create_vless_user(data: VLESSRequest):
             },
             "tag": outbound_tag
         }
+        
+        if any(o.get("tag") == outbound_tag for o in outbounds):
+            logger.warning(f"Outbound с тегом {outbound_tag} уже существует")
+        else:
+            outbounds.append(new_outbound)
+            logger.info(f"Outbound {outbound_tag} добавлен")
+
         outbounds.append(new_outbound)
         config["outbounds"] = outbounds
         logger.info(f"Outbound {outbound_tag} добавлен")

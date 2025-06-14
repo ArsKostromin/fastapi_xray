@@ -38,6 +38,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/log/xray/access.log:/var/log/xray/access.log:ro
       - /var/log/xray/error.log:/var/log/xray/error.log:ro
-      - /etc/squid/passwd:/etc/squid/passwd:rw
+      - ./squid/passwd:/etc/squid/passwd:rw
     environment:
       - PYTHONUNBUFFERED=1
