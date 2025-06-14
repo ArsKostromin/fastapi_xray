@@ -95,7 +95,7 @@ async def create_vless_user(data: VLESSRequest):
         })
         logger.info(f"Клиент {uid} добавлен")
 
-        # Добавляем outbound
+        # Добавляем outbound (если ещё не существует)
         outbound_tag = f"user-{uid}"
         new_outbound = {
             "protocol": "http",
@@ -116,27 +116,29 @@ async def create_vless_user(data: VLESSRequest):
             },
             "tag": outbound_tag
         }
-        
+
         if any(o.get("tag") == outbound_tag for o in outbounds):
             logger.warning(f"Outbound с тегом {outbound_tag} уже существует")
         else:
             outbounds.append(new_outbound)
             logger.info(f"Outbound {outbound_tag} добавлен")
 
-        outbounds.append(new_outbound)
         config["outbounds"] = outbounds
-        logger.info(f"Outbound {outbound_tag} добавлен")
 
-        # Добавляем routing rule
+        # Добавляем routing rule (если ещё не существует)
         if "routing" not in config:
             config["routing"] = {"domainStrategy": "AsIs", "rules": []}
-        config["routing"]["rules"].append({
-            "type": "field",
-            "inboundTag": ["vless-in"],
-            "email": email,
-            "outboundTag": outbound_tag
-        })
-        logger.info(f"Правило маршрутизации для {email} добавлено")
+
+        if not any(rule.get("email") == email for rule in config["routing"]["rules"]):
+            config["routing"]["rules"].append({
+                "type": "field",
+                "inboundTag": ["vless-in"],
+                "email": email,
+                "outboundTag": outbound_tag
+            })
+            logger.info(f"Правило маршрутизации для {email} добавлено")
+        else:
+            logger.warning(f"Routing правило для {email} уже существует")
 
         # Сохраняем конфиг
         async with aiofiles.open(XRAY_CONFIG_PATH, "w") as f:
@@ -189,8 +191,13 @@ async def delete_vless_user(data: VLESSRequest):
             return VLESSResponse(success=False, message="UUID not found")
 
         config["inbounds"][0]["settings"]["clients"] = clients
-        config["outbounds"] = [o for o in config.get("outbounds", []) if not any(u.get("user") == uid for s in o.get("settings", {}).get("servers", []) for u in s.get("users", []))]
-        config["routing"]["rules"] = [r for r in config["routing"]["rules"] if r.get("email") != f"{uid}@vpn"]
+        config["outbounds"] = [
+            o for o in config.get("outbounds", [])
+            if not any(u.get("user") == uid for s in o.get("settings", {}).get("servers", []) for u in s.get("users", []))
+        ]
+        config["routing"]["rules"] = [
+            r for r in config["routing"]["rules"] if r.get("email") != f"{uid}@vpn"
+        ]
 
         async with aiofiles.open(XRAY_CONFIG_PATH, "w") as f:
             await f.write(json.dumps(config, indent=2))
