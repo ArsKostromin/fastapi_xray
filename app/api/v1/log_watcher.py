@@ -4,8 +4,8 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-SQUID_LOG_PATH = "/var/log/squid/access.log"
-XRAY_LOG_PATH = "/var/log/xray/access.log"
+SQUID_LOG_PATH = "/logs/squid/access.log"
+XRAY_LOG_PATH = "/logs/xray/access.log"
 CENTRAL_LOG_SERVER = "https://server2.anonixvpn.space/proxylogs/receive-log/"
 
 class XraySquidLogTailer:
