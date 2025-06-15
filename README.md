@@ -1,8 +1,5 @@
 # My FastAPI Project
 
-
-Вот красиво оформленный `README.md` под твой FastAPI-проект с Docker, SSL и всеми финтифлюшками:
-
 ---
 
 ````markdown
