@@ -2,7 +2,7 @@ import asyncio
 import aiohttp
 import re
 from datetime import datetime
-from subprocess import PIPE, create_subprocess_exec
+from asyncio.subprocess import PIPE, create_subprocess_exec
 
 # SQUID_LOG_PATH = "/logs/squid/access.log"
 
