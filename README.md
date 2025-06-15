@@ -1,6 +1,6 @@
 # My FastAPI Project
 
----
+
 
 ````markdown
 # 🚀 FastAPI Backend Template
