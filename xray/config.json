@@ -24,15 +24,15 @@
         "tlsSettings": {
           "certificates": [
             {
-              "certificateFile": "/etc/letsencrypt/live/australia.anonixvpn.space/fullchain.pem",
-              "keyFile": "/etc/letsencrypt/live/australia.anonixvpn.space/privkey.pem"
+              "certificateFile": "/etc/letsencrypt/live/germany.anonixvpn.space/fullchain.pem",
+              "keyFile": "/etc/letsencrypt/live/germany.anonixvpn.space/privkey.pem"
             }
           ]
         },
         "wsSettings": {
           "path": "/ws",
           "headers": {
-            "Host": "australia.anonixvpn.space"
+            "Host": "germany.anonixvpn.space"
           }
         }
       },
