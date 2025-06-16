@@ -39,7 +39,7 @@ services:
 
       - ./logs/xray/access.log:/logs/xray/access.log:ro
       - ./logs/xray/error.log:/logs/xray/error.log:ro
-      - ./logs/squid/access.log:/logs/squid/access.log:ro
+      - ./logs/squid/access.log:/logs/squid/access.log:rw
 
       - ./squid/passwd:/etc/squid/passwd:rw
     environment:
