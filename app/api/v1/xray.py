@@ -7,6 +7,7 @@ import aiofiles
 import asyncio
 import subprocess
 import logging
+from fastapi.responses import JSONResponse
 
 router = APIRouter()
 
@@ -208,4 +209,22 @@ async def delete_vless_user(data: VLESSRequest):
 
     except Exception as e:
         logger.error(f"Ошибка при удалении VLESS: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+#получение колличества пользователей
+@router.get("/vless/count")
+async def count_vless_users():
+    try:
+        logger.info(f"Подсчёт пользователей в конфиге: {XRAY_CONFIG_PATH}")
+        async with aiofiles.open(XRAY_CONFIG_PATH, "r") as f:
+            config_data = await f.read()
+        config = json.loads(config_data)
+
+        clients = config["inbounds"][0]["settings"].get("clients", [])
+        user_count = len(clients)
+        logger.info(f"Найдено пользователей: {user_count}")
+        return JSONResponse(content={"user_count": user_count})
+    except Exception as e:
+        logger.error(f"Ошибка при подсчёте VLESS-пользователей: {e}")
         raise HTTPException(status_code=500, detail=str(e))
