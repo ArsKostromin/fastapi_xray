@@ -37,7 +37,7 @@ async def add_user_to_htpasswd(user: str, password: str):
     try:
         logger.info(f"Добавление пользователя {user} в htpasswd")
         result = subprocess.run(
-            ["htpasswd", "-bB", SQUID_PASSWD_FILE, user, password],
+            ["htpasswd", "-b", "-m", SQUID_PASSWD_FILE, user, password],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
