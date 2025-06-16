@@ -12,13 +12,16 @@ services:
     network_mode: host
 
   squid:
-    image: ubuntu/squid
+    build:
+      context: ./squid
+      dockerfile: Dockerfile
     container_name: squid
     restart: unless-stopped
     volumes:
       - ./squid/squid.conf:/etc/squid/squid.conf:ro
       - ./squid/passwd:/etc/squid/passwd:ro
       - ./logs/squid:/logs/squid
+      - ./squid/cache:/var/spool/squid
     network_mode: host
 
   fastapi:
@@ -31,16 +34,12 @@ services:
     volumes:
       - ./app:/app/app
       - ./restart_xray.sh:/app/restart_xray.sh:rw
-
       - ./xray/config.json:/usr/local/etc/xray/config.json:rw
-
       - /etc/systemd/system:/etc/systemd/system:ro
       - /var/run/docker.sock:/var/run/docker.sock
-
       - ./logs/xray/access.log:/logs/xray/access.log:ro
       - ./logs/xray/error.log:/logs/xray/error.log:ro
       - ./logs/squid/access.log:/logs/squid/access.log:ro
-
       - ./squid/passwd:/etc/squid/passwd:rw
     environment:
       - PYTHONUNBUFFERED=1
