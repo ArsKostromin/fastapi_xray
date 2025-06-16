@@ -14,6 +14,16 @@
             "id": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
             "level": 0,
             "email": "74b741f9-ea44-4f16-8599-90bcc31ae3cc"
+          },
+          {
+            "id": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d",
+            "level": 0,
+            "email": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d@vpn"
+          },
+          {
+            "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+            "level": 0,
+            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42@vpn"
           }
         ],
         "decryption": "none"
@@ -39,7 +49,10 @@
       "tag": "vless-in",
       "sniffing": {
         "enabled": true,
-        "destOverride": ["http", "tls"]
+        "destOverride": [
+          "http",
+          "tls"
+        ]
       }
     },
     {
@@ -84,6 +97,44 @@
     {
       "protocol": "blackhole",
       "tag": "blocked"
+    },
+    {
+      "protocol": "http",
+      "settings": {
+        "servers": [
+          {
+            "address": "127.0.0.1",
+            "port": 8888,
+            "users": [
+              {
+                "user": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d",
+                "pass": "x",
+                "auth": "basic"
+              }
+            ]
+          }
+        ]
+      },
+      "tag": "user-1d16090f-eb64-4cc9-95e5-f9b482d90d4d"
+    },
+    {
+      "protocol": "http",
+      "settings": {
+        "servers": [
+          {
+            "address": "127.0.0.1",
+            "port": 8888,
+            "users": [
+              {
+                "user": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+                "pass": "x",
+                "auth": "basic"
+              }
+            ]
+          }
+        ]
+      },
+      "tag": "user-960f001f-d065-410e-8a0d-c8aa2af4fe42"
     }
   ],
   "routing": {
@@ -97,20 +148,45 @@
       },
       {
         "type": "field",
-        "inboundTag": ["vless-in"],
+        "inboundTag": [
+          "vless-in"
+        ],
         "email": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
         "outboundTag": "user-74b741"
       },
       {
         "type": "field",
-        "inboundTag": ["vless-in"],
-        "ip": ["0.0.0.0/0", "::/0"],
+        "inboundTag": [
+          "vless-in"
+        ],
+        "ip": [
+          "0.0.0.0/0",
+          "::/0"
+        ],
         "outboundTag": "user-74b741"
       },
       {
         "type": "field",
-        "inboundTag": ["socks-in"],
+        "inboundTag": [
+          "socks-in"
+        ],
         "outboundTag": "user-74b741"
+      },
+      {
+        "type": "field",
+        "inboundTag": [
+          "vless-in"
+        ],
+        "email": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d@vpn",
+        "outboundTag": "user-1d16090f-eb64-4cc9-95e5-f9b482d90d4d"
+      },
+      {
+        "type": "field",
+        "inboundTag": [
+          "vless-in"
+        ],
+        "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42@vpn",
+        "outboundTag": "user-960f001f-d065-410e-8a0d-c8aa2af4fe42"
       }
     ]
   }
