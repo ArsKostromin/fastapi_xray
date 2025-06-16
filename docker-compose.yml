@@ -6,9 +6,9 @@ services:
     container_name: xray
     restart: unless-stopped
     volumes:
-      - ./xray/config.json:/etc/xray/config.json:rw       # rw — чтобы xray мог менять конфиг если надо
-      - /etc/letsencrypt:/etc/letsencrypt:ro              # letsencrypt обычно readonly
-      - ./logs/xray:/logs/xray:rw                          # логи — rw чтобы писать
+      - ./xray/config.json:/etc/xray/config.json:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./logs/xray:/logs/xray
     network_mode: host
 
   squid:
@@ -16,9 +16,9 @@ services:
     container_name: squid
     restart: unless-stopped
     volumes:
-      - ./squid/squid.conf:/etc/squid/squid.conf:rw       # rw — чтобы squid мог менять конфиг (если надо)
-      - ./squid/passwd:/etc/squid/passwd:rw               # rw — чтобы squid мог читать/писать пароли
-      - ./logs/squid:/logs/squid:rw                        # логи squid — rw
+      - ./squid/squid.conf:/etc/squid/squid.conf:ro
+      - ./squid/passwd:/etc/squid/passwd:ro
+      - ./logs/squid:/logs/squid
     network_mode: host
 
   fastapi:
@@ -29,7 +29,7 @@ services:
     ports:
       - "8081:8081"
     volumes:
-      - ./app:/app/app:rw
+      - ./app:/app/app
       - ./restart_xray.sh:/app/restart_xray.sh:rw
 
       - ./xray/config.json:/usr/local/etc/xray/config.json:rw
@@ -37,10 +37,10 @@ services:
       - /etc/systemd/system:/etc/systemd/system:ro
       - /var/run/docker.sock:/var/run/docker.sock
 
-      - ./logs/xray/access.log:/logs/xray/access.log:rw   # rw — чтобы fastapi мог читать/писать логи
-      - ./logs/xray/error.log:/logs/xray/error.log:rw
-      - ./logs/squid/access.log:/logs/squid/access.log:rw
+      - ./logs/xray/access.log:/logs/xray/access.log:ro
+      - ./logs/xray/error.log:/logs/xray/error.log:ro
+      - ./logs/squid/access.log:/logs/squid/access.log:ro
 
-      - ./squid/passwd:/etc/squid/passwd:rw               # rw — fastapi тоже пускаем к passwd
+      - ./squid/passwd:/etc/squid/passwd:rw
     environment:
       - PYTHONUNBUFFERED=1

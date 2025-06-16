@@ -11,4 +11,4 @@ COPY ./app /app/app
 COPY restart_xray.sh /app/restart_xray.sh
 RUN chmod +x /app/restart_xray.sh
 
-CMD sh -c "chown -R proxy:proxy /logs/squid && uvicorn app.main:app --host 0.0.0.0 --port 8081 --reload"
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8081", "--reload"]
