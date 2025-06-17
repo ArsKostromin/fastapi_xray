@@ -34,15 +34,15 @@
         "tlsSettings": {
           "certificates": [
             {
-              "certificateFile": "/etc/letsencrypt/live/us-la.anonixvpn.space/fullchain.pem",
-              "keyFile": "/etc/letsencrypt/live/us-la.anonixvpn.space/privkey.pem"
+              "certificateFile": "/etc/letsencrypt/live/russia.anonixvpn.space/fullchain.pem",
+              "keyFile": "/etc/letsencrypt/live/russia.anonixvpn.space/privkey.pem"
             }
           ]
         },
         "wsSettings": {
           "path": "/ws",
           "headers": {
-            "Host": "us-la.anonixvpn.space"
+            "Host": "russia.anonixvpn.space"
           }
         }
       },
