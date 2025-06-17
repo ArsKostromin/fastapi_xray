@@ -34,15 +34,15 @@
         "tlsSettings": {
           "certificates": [
             {
-              "certificateFile": "/etc/letsencrypt/live/united-kingdom.anonixvpn.space/fullchain.pem",
-              "keyFile": "/etc/letsencrypt/live/united-kingdom.anonixvpn.space/privkey.pem"
+              "certificateFile": "/etc/letsencrypt/live/germany.anonixvpn.space/fullchain.pem",
+              "keyFile": "/etc/letsencrypt/live/germany.anonixvpn.space/privkey.pem"
             }
           ]
         },
         "wsSettings": {
           "path": "/ws",
           "headers": {
-            "Host": "united-kingdom.anonixvpn.space"
+            "Host": "germany.anonixvpn.space"
           }
         }
       },
