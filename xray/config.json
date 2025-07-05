@@ -34,14 +34,14 @@
         "tlsSettings": {
           "certificates": [
             {
-              "certificateFile": "/etc/letsencrypt/live/germany.anonixvpn.space/fullchain.pem",
-              "keyFile": "/etc/letsencrypt/live/germany.anonixvpn.space/privkey.pem"
+              "certificateFile": "/etc/letsencrypt/live/us-la.anonixvpn.space/fullchain.pem",
+              "keyFile": "/etc/letsencrypt/live/us-la.anonixvpn.space/privkey.pem"
             }
           ]
         },
         "xhttpSettings": {
           "path": "/ws",
-          "host": "germany.anonixvpn.space"
+          "host": "us-la.anonixvpn.space"
         }
       },
       "tag": "vless-in",
