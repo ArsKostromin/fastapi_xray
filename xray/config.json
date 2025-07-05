@@ -29,7 +29,7 @@
         "decryption": "none"
       },
       "streamSettings": {
-        "network": "xhttp",
+        "network": "ws",
         "security": "tls",
         "tlsSettings": {
           "certificates": [
@@ -39,9 +39,11 @@
             }
           ]
         },
-        "xhttpSettings": {
+        "wsSettings": {
           "path": "/ws",
-          "host": "us-la.anonixvpn.space"
+          "headers": {
+            "Host": "us-la.anonixvpn.space"
+          }
         }
       },
       "tag": "vless-in",
