@@ -19,6 +19,7 @@ services:
       - ./squid/squid.conf:/etc/squid/squid.conf:ro
       - ./squid/passwd:/etc/squid/passwd:ro
       - ./logs/squid:/logs/squid
+      - squid_cache:/var/spool/squid
     network_mode: host
 
   fastapi:
@@ -44,3 +45,6 @@ services:
       - ./squid/passwd:/etc/squid/passwd:rw
     environment:
       - PYTHONUNBUFFERED=1
+
+volumes:
+  squid_cache:
