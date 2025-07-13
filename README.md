@@ -1,3 +1,7 @@
+sudo chown -R  proxy:proxy ./logs/squid
+
+sudo chown -R 13:13 ./logs/squid
+
 # My FastAPI Project
 
 
