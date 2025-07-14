@@ -24,6 +24,11 @@
             "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
             "level": 0,
             "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42@vpn"
+          },
+          {
+            "id": "7e8a2c1d-5b4e-4f2a-9c3d-8e7f6a5b4c2d",
+            "level": 0,
+            "email": "cascadeuser@vpn"
           }
         ],
         "decryption": "none"
@@ -59,7 +64,13 @@
       "port": 1443,
       "protocol": "vless",
       "settings": {
-        "clients": [],
+        "clients": [
+          {
+            "id": "7e8a2c1d-5b4e-4f2a-9c3d-8e7f6a5b4c2d",
+            "level": 0,
+            "email": "cascadeuser@vpn"
+          }
+        ],
         "decryption": "none"
       },
       "streamSettings": {
