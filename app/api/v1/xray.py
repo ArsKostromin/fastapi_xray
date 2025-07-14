@@ -133,7 +133,7 @@ async def create_vless_user(data: VLESSRequest):
         if not any(rule.get("email") == email for rule in config["routing"]["rules"]):
             config["routing"]["rules"].append({
                 "type": "field",
-                "inboundTag": ["vless-in"],
+                "inboundTag": ["vless-single"],
                 "email": email,
                 "outboundTag": outbound_tag
             })

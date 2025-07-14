@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.v1 import xray
+from app.api.v1 import xray, cascade
 from app.api.v1.log_watcher import tailer
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -14,6 +14,7 @@ app.add_middleware(
 )
 
 app.include_router(xray.router, prefix="/api/v1", tags=["Xray"])
+app.include_router(cascade.router, prefix="/api/v1", tags=["Cascade"])
 
 @app.on_event("startup")
 async def startup_event():
