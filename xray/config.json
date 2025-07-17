@@ -26,8 +26,8 @@
           "dest": "microsoft.com:443",
           "xver": 0,
           "serverNames": ["microsoft.com", "www.microsoft.com"],
-          "privateKey": "1b1e1c2e2e3e4e5e6e7e8e9e0e1e2e3e4e5e6e7e8e9e0e1e2e3e4e5e6e7e8e9",
-          "publicKey": "b1b2b3b4b5b6b7b8b9b0b1b2b3b4b5b6b7b8b9b0b1b2b3b4b5b6b7b8b9b0b1b2b3b4b5b6b7b8b9b0b1b2b3b4b5b6b7b8b9",
+          "privateKey": "6b1e2c3d4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c",
+          "publicKey": "b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2",
           "shortIds": ["974508", "2884", "f6213f68", "a79d7e", "690a4"]
         },
         "tcpSettings": {}
