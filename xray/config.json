@@ -264,5 +264,12 @@
         "outboundTag": "user-960f001f-d065-410e-8a0d-c8aa2af4fe42"
       }
     ]
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "conn": 5
+      }
+    }
   }
 }
