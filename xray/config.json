@@ -6,59 +6,33 @@
   },
   "inbounds": [
     {
-      "port": 443,
+      "port": 48086,
       "protocol": "vless",
       "settings": {
         "clients": [
           {
-            "id": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
-            "level": 0,
-            "email": "74b741f9-ea44-4f16-8599-90bcc31ae3cc"
-          },
-          {
-            "id": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d",
-            "level": 0,
-            "email": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d@vpn"
-          },
-          {
             "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
             "level": 0,
             "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42@vpn"
-          },
-          {
-            "id": "7e8a2c1d-5b4e-4f2a-9c3d-8e7f6a5b4c2d",
-            "level": 0,
-            "email": "cascadeuser@vpn"
           }
         ],
         "decryption": "none"
       },
       "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "certificates": [
-            {
-              "certificateFile": "/etc/letsencrypt/live/japan.anonixvpn.space/fullchain.pem",
-              "keyFile": "/etc/letsencrypt/live/japan.anonixvpn.space/privkey.pem"
-            }
-          ]
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "microsoft.com:443",
+          "xver": 0,
+          "serverNames": ["microsoft.com", "www.microsoft.com"],
+          "privateKey": "1b1e1c2e2e3e4e5e6e7e8e9e0e1e2e3e4e5e6e7e8e9e0e1e2e3e4e5e6e7e8e9",
+          "publicKey": "b1b2b3b4b5b6b7b8b9b0b1b2b3b4b5b6b7b8b9b0b1b2b3b4b5b6b7b8b9b0b1b2b3b4b5b6b7b8b9b0b1b2b3b4b5b6b7b8b9",
+          "shortIds": ["974508", "2884", "f6213f68", "a79d7e", "690a4"]
         },
-        "wsSettings": {
-          "path": "/ws",
-          "headers": {
-            "Host": "japan.anonixvpn.space"
-          }
-        }
+        "tcpSettings": {}
       },
-      "tag": "vless-single",
-      "sniffing": {
-        "enabled": true,
-        "destOverride": [
-          "http",
-          "tls"
-        ]
-      }
+      "tag": "vless-reality"
     },
     {
       "port": 1443,
