@@ -28,7 +28,7 @@
           "serverNames": ["microsoft.com", "www.microsoft.com"],
           "privateKey": "MKmOvMSCrWxf0ptC2s5cYpp-ddFcjNN2J8vDWcWtWGM",
           "publicKey": "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY",
-          "shortIds": ["974508", "2884", "f6213f68", "a79d7e", "690a4"]
+          "shortIds": ["f6213f68", "97450800", "a79d7e00", "2884abcd"]
         },
         "tcpSettings": {}
       },
