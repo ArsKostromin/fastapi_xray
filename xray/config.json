@@ -39,15 +39,15 @@
         "tlsSettings": {
           "certificates": [
             {
-              "certificateFile": "/etc/letsencrypt/live/usa.anonixvpn.space/fullchain.pem",
-              "keyFile": "/etc/letsencrypt/live/usa.anonixvpn.space/privkey.pem"
+              "certificateFile": "/etc/letsencrypt/live/japan.anonixvpn.space/fullchain.pem",
+              "keyFile": "/etc/letsencrypt/live/japan.anonixvpn.space/privkey.pem"
             }
           ]
         },
         "wsSettings": {
           "path": "/ws",
           "headers": {
-            "Host": "usa.anonixvpn.space"
+            "Host": "japan.anonixvpn.space"
           }
         }
       },
@@ -79,15 +79,15 @@
         "tlsSettings": {
           "certificates": [
             {
-              "certificateFile": "/etc/letsencrypt/live/usa.anonixvpn.space/fullchain.pem",
-              "keyFile": "/etc/letsencrypt/live/usa.anonixvpn.space/privkey.pem"
+              "certificateFile": "/etc/letsencrypt/live/japan.anonixvpn.space/fullchain.pem",
+              "keyFile": "/etc/letsencrypt/live/japan.anonixvpn.space/privkey.pem"
             }
           ]
         },
         "wsSettings": {
           "path": "/cascade",
           "headers": {
-            "Host": "usa.anonixvpn.space"
+            "Host": "japan.anonixvpn.space"
           }
         }
       },
