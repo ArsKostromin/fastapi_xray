@@ -7,7 +7,7 @@
   "inbounds": [
     {
       "tag": "reality-vless",
-      "port": 443,
+      "port": 80,
       "listen": "0.0.0.0",
       "protocol": "vless",
       "settings": {
