@@ -14,7 +14,8 @@
         "clients": [
           {
             "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
-            "level": 0
+            "level": 0,
+            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42"
           }
         ],
         "decryption": "none"
