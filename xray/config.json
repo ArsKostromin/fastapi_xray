@@ -24,7 +24,7 @@
         "security": "reality",
         "realitySettings": {
           "show": false,
-          "dest": "www.cloudflare.com:443",
+          "dest": "www.cloudflare.com:80",
           "xver": 0,
           "serverNames": [
             "www.cloudflare.com"
