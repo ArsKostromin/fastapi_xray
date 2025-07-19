@@ -7,7 +7,7 @@
   "inbounds": [
     {
       "tag": "reality-vless",
-      "port": 80,
+      "port": 8443 ,
       "listen": "0.0.0.0",
       "protocol": "vless",
       "settings": {
@@ -24,7 +24,7 @@
         "security": "reality",
         "realitySettings": {
           "show": false,
-          "dest": "www.cloudflare.com:80",
+          "dest": "www.cloudflare.com:8443 ",
           "xver": 0,
           "serverNames": [
             "www.cloudflare.com"
