@@ -7,7 +7,7 @@
   "inbounds": [
     {
       "tag": "reality-vless",
-      "port": 443,
+      "port": 2095,
       "listen": "0.0.0.0",
       "protocol": "vless",
       "settings": {
@@ -15,7 +15,8 @@
           {
             "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
             "level": 0,
-            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42"
+            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+            "flow": "xtls-rprx-vision"
           }
         ],
         "decryption": "none"
@@ -25,10 +26,10 @@
         "security": "reality",
         "realitySettings": {
           "show": false,
-          "dest": "www.cloudflare.com:443",
+          "dest": "google.com:2095",
           "xver": 0,
           "serverNames": [
-            "www.cloudflare.com"
+            "google.com"
           ],
           "privateKey": "MKmOvMSCrWxf0ptC2s5cYpp-ddFcjNN2J8vDWcWtWGM",
           "publicKey": "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY",
