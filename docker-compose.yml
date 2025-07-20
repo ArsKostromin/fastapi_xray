@@ -44,3 +44,4 @@ services:
       - ./squid/passwd:/etc/squid/passwd:rw
     environment:
       - PYTHONUNBUFFERED=1
+      
