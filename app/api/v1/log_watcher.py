@@ -23,27 +23,29 @@ class XrayLogTailer:
         if self.task:
             self.task.cancel()
 
-    async def find_squid_info(self, uuid, domain):
-        """
-        Асинхронно ищет последнюю подходящую строку в логе Squid по uuid/email и домену,
-        возвращает (status, bytes_sent) или (None, None) если не найдено.
-        """
+    async def find_squid_info(self, uuid, domain, xray_timestamp=None):
         if not os.path.exists(self.squid_log_path):
             return None, None
         try:
-            # Читаем только последние 1000 строк для ускорения
             async with aiofiles.open(self.squid_log_path, "r") as f:
                 lines = deque(maxlen=1000)
                 async for line in f:
                     lines.append(line)
             for line in reversed(lines):
-                # logformat compact: ... <user> <method> <url> <status> <bytes_sent> ...
-                match = re.match(r"\d+\.\d+ [^ ]+ [^ ]+ ([^ ]+) ([A-Z]+) ([^ ]+) (\d+) (\d+) ", line)
+                match = re.match(r"(\d+\.\d+) [^ ]+ [^ ]+ ([^ ]+) ([A-Z]+) ([^ ]+) (\d+) (\d+) ", line)
                 if not match:
                     continue
-                user, method, url, status, bytes_sent = match.groups()
-                # user = uuid, url = domain:port
-                if uuid == user and domain in url:
+                unix_ts, user, method, url, status, bytes_sent = match.groups()
+                user_base = user.split("@")[0]
+                url_domain = url.split(":")[0]
+                # Сравниваем uuid и домен
+                if uuid == user_base and domain == url_domain:
+                    # Если есть время из Xray, сравниваем разницу
+                    if xray_timestamp:
+                        squid_time = float(unix_ts)
+                        xray_time = xray_timestamp.timestamp()
+                        if abs(squid_time - xray_time) > 10:  # 10 секунд окно
+                            continue
                     return status, int(bytes_sent)
         except Exception as e:
             print(f"Ошибка поиска в squid access.log: {e}")
@@ -77,11 +79,11 @@ class XrayLogTailer:
                     continue
 
                 timestamp_str, ip, domain, uuid = match.groups()
-                # Найдём статус и байты из squid (асинхронно)
-                status, bytes_sent = await self.find_squid_info(uuid, domain)
                 try:
                     dt = datetime.strptime(timestamp_str, "%Y/%m/%d %H:%M:%S")
                     timestamp_iso = dt.isoformat()
+                    # Найдём статус и байты из squid (асинхронно, с учётом времени)
+                    status, bytes_sent = await self.find_squid_info(uuid, domain, dt)
 
                     payload = {
                         "uuid": uuid,
