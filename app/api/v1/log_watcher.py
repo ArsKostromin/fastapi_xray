@@ -9,6 +9,8 @@ from asyncio.subprocess import PIPE, create_subprocess_exec
 XRAY_LOG_PATH = "/logs/xray/access.log"
 CENTRAL_LOG_SERVER = "https://server2.anonixvpn.space/proxylogs/receive-log/"
 
+SQUID_LOG_PATH = "/logs/squid/access.log"
+
 class XrayLogTailer:
     def __init__(self):
         self.task = None
@@ -21,7 +23,6 @@ class XrayLogTailer:
 
     async def parse_xray_log(self):
         print("📦 Запущен парсер Xray access.log через cat + tail -F")
-
         try:
             proc = await create_subprocess_exec(
                 "tail", "-F", XRAY_LOG_PATH,
@@ -37,7 +38,6 @@ class XrayLogTailer:
                 if not line:
                     await asyncio.sleep(0.1)
                     continue
-
                 line = line.decode().strip()
                 match = re.search(
                     r"(\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2})\.\d+ from ([\d\.]+):\d+ accepted tcp:([^:]+):\d+ .*email: ([a-f0-9\-]+)",
@@ -45,19 +45,16 @@ class XrayLogTailer:
                 )
                 if not match:
                     continue
-
                 timestamp_str, ip, domain, uuid = match.groups()
                 try:
                     dt = datetime.strptime(timestamp_str, "%Y/%m/%d %H:%M:%S")
                     timestamp_iso = dt.isoformat()
-
                     payload = {
                         "uuid": uuid,
                         "ip": ip,
                         "destination": domain,
                         "timestamp": timestamp_iso,
                     }
-
                     print(f"📤 Отправляем лог: {payload}")
                     async with session.post(CENTRAL_LOG_SERVER, json=payload) as resp:
                         if resp.status != 201:
@@ -65,9 +62,60 @@ class XrayLogTailer:
                 except Exception as e:
                     print(f"⚠️ Ошибка обработки строки: {e}")
 
+    async def parse_squid_log(self):
+        print("📦 Запущен парсер Squid access.log через cat + tail -F")
+        try:
+            proc = await create_subprocess_exec(
+                "tail", "-F", SQUID_LOG_PATH,
+                stdout=PIPE, stderr=PIPE
+            )
+        except FileNotFoundError:
+            print(f"❌ Не удалось найти файл {SQUID_LOG_PATH}")
+            return
+
+        async with aiohttp.ClientSession() as session:
+            while self.running:
+                line = await proc.stdout.readline()
+                if not line:
+                    await asyncio.sleep(0.1)
+                    continue
+                line = line.decode().strip()
+                match = re.match(r"(\d+\.\d+) ([^ ]+) ([^ ]+) ([^ ]+) ([A-Z]+) ([^ ]+) (\d+) (\d+) ([^ ]+) ([^ ]+) \"([^\"]*)\" \"([^\"]*)\"", line)
+                if not match:
+                    continue
+                (
+                    timestamp, client_ip, server_ip, user, method, url, status, bytes_sent, hierarchy, squid_status, user_agent, host
+                ) = match.groups()
+                try:
+                    dt = datetime.utcfromtimestamp(float(timestamp.split(".")[0]))
+                    timestamp_iso = dt.isoformat()
+                    payload = {
+                        "user": user,
+                        "client_ip": client_ip,
+                        "server_ip": server_ip,
+                        "method": method,
+                        "url": url,
+                        "status": status,
+                        "bytes_sent": int(bytes_sent),
+                        "hierarchy": hierarchy,
+                        "squid_status": squid_status,
+                        "host": host,
+                        "timestamp": timestamp_iso,
+                    }
+                    print(f"📤 Отправляем squid-лог: {payload}")
+                    async with session.post(CENTRAL_LOG_SERVER, json=payload) as resp:
+                        if resp.status != 201:
+                            print(f"❗️Ошибка отправки: {resp.status}")
+                except Exception as e:
+                    print(f"⚠️ Ошибка обработки строки squid: {e}")
+
     async def tail_log(self):
         self.running = True
-        await self.parse_xray_log()
+        # Запускаем оба парсера параллельно
+        await asyncio.gather(
+            self.parse_xray_log(),
+            self.parse_squid_log()
+        )
 
     async def start(self):
         if not self.task:
