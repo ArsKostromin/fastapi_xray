@@ -75,11 +75,21 @@
     }
   ],
   "routing": {
-    "domainStrategy": "AsIs",
+    "domainStrategy": "IPIfNonMatch",
     "rules": [
       {
         "type": "field",
-        "outboundTag": "squid-proxy"
+        "outboundTag": "dns-out",
+        "network": "udp",
+        "port": 53
+      },
+      {
+        "type": "field",
+        "inboundTag": [
+          "vless-single"
+        ],
+        "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42@vpn",
+        "outboundTag": "user-960f001f-d065-410e-8a0d-c8aa2af4fe42"
       }
     ]
   },
