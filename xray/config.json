@@ -13,26 +13,22 @@
           {
             "id": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
             "level": 0,
-            "email": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
-            "flow": "xtls-rprx-vision"
+            "email": "74b741f9-ea44-4f16-8599-90bcc31ae3cc"
           },
           {
             "id": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d",
             "level": 0,
-            "email": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d@vpn",
-            "flow": "xtls-rprx-vision"
+            "email": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d@vpn"
           },
           {
             "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
             "level": 0,
-            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42@vpn",
-            "flow": "xtls-rprx-vision"
+            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42@vpn"
           },
           {
             "id": "7e8a2c1d-5b4e-4f2a-9c3d-8e7f6a5b4c2d",
             "level": 0,
-            "email": "cascadeuser@vpn",
-            "flow": "xtls-rprx-vision"
+            "email": "cascadeuser@vpn"
           }
         ],
         "decryption": "none"
@@ -72,8 +68,7 @@
           {
             "id": "7e8a2c1d-5b4e-4f2a-9c3d-8e7f6a5b4c2d",
             "level": 0,
-            "email": "cascadeuser@vpn",
-            "flow": "xtls-rprx-vision"
+            "email": "cascadeuser@vpn"
           }
         ],
         "decryption": "none"
