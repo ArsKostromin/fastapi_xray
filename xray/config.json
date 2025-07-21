@@ -6,269 +6,73 @@
   },
   "inbounds": [
     {
+      "tag": "reality-vless",
       "port": 443,
+      "listen": "0.0.0.0",
       "protocol": "vless",
       "settings": {
         "clients": [
-          {
-            "id": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
-            "level": 0,
-            "email": "74b741f9-ea44-4f16-8599-90bcc31ae3cc"
-          },
-          {
-            "id": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d",
-            "level": 0,
-            "email": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d@vpn"
-          },
           {
             "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
             "level": 0,
-            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42@vpn"
-          },
-          {
-            "id": "7e8a2c1d-5b4e-4f2a-9c3d-8e7f6a5b4c2d",
-            "level": 0,
-            "email": "cascadeuser@vpn"
+            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+            "flow": "xtls-rprx-vision"
           }
         ],
         "decryption": "none"
       },
       "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "certificates": [
-            {
-              "certificateFile": "/etc/letsencrypt/live/usa.anonixvpn.space/fullchain.pem",
-              "keyFile": "/etc/letsencrypt/live/usa.anonixvpn.space/privkey.pem"
-            }
-          ]
-        },
-        "wsSettings": {
-          "path": "/ws",
-          "headers": {
-            "Host": "usa.anonixvpn.space"
-          }
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "google.com:443",
+          "xver": 0,
+          "serverNames": [
+            "google.com"
+          ],
+          "privateKey": "MKmOvMSCrWxf0ptC2s5cYpp-ddFcjNN2J8vDWcWtWGM",
+          "publicKey": "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY",
+          "shortIds": [
+            "f6213f68"
+          ],
+          "spiderX": "/"
         }
       },
-      "tag": "vless-single",
       "sniffing": {
         "enabled": true,
-        "destOverride": [
-          "http",
-          "tls"
-        ]
+        "routeOnly": false,
+        "destOverride": ["http", "tls"]
       }
-    },
-    {
-      "port": 1443,
-      "protocol": "vless",
-      "settings": {
-        "clients": [
-          {
-            "id": "7e8a2c1d-5b4e-4f2a-9c3d-8e7f6a5b4c2d",
-            "level": 0,
-            "email": "cascadeuser@vpn"
-          }
-        ],
-        "decryption": "none"
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "certificates": [
-            {
-              "certificateFile": "/etc/letsencrypt/live/usa.anonixvpn.space/fullchain.pem",
-              "keyFile": "/etc/letsencrypt/live/usa.anonixvpn.space/privkey.pem"
-            }
-          ]
-        },
-        "wsSettings": {
-          "path": "/cascade",
-          "headers": {
-            "Host": "usa.anonixvpn.space"
-          }
-        }
-      },
-      "tag": "vless-cascade",
-      "sniffing": {
-        "enabled": true,
-        "destOverride": [
-          "http",
-          "tls"
-        ]
-      }
-    },
-    {
-      "port": 10808,
-      "listen": "127.0.0.1",
-      "protocol": "socks",
-      "settings": {
-        "auth": "noauth",
-        "udp": true
-      },
-      "tag": "socks-in"
     }
   ],
   "outbounds": [
     {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "brazil.anonixvpn.space",
-            "port": 8443,
-            "users": [
-              {
-                "id": "b7e2e1c2-4f3a-4e2a-9b1a-2c3d4e5f6a7b",
-                "level": 0,
-                "encryption": "none"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "none"
-      },
-      "tag": "cascade-to-server2"
+      "tag": "direct",
+      "protocol": "freedom"
     },
     {
-      "protocol": "http",
-      "settings": {
-        "servers": [
-          {
-            "address": "127.0.0.1",
-            "port": 8888,
-            "users": [
-              {
-                "user": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
-                "pass": "x",
-                "auth": "basic"
-              }
-            ]
-          }
-        ]
-      },
-      "tag": "user-74b741"
-    },
-    {
-      "protocol": "dns",
-      "tag": "dns-out"
-    },
-    {
-      "protocol": "freedom",
-      "tag": "direct"
-    },
-    {
-      "protocol": "blackhole",
-      "tag": "blocked"
-    },
-    {
-      "protocol": "http",
-      "settings": {
-        "servers": [
-          {
-            "address": "127.0.0.1",
-            "port": 8888,
-            "users": [
-              {
-                "user": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d",
-                "pass": "x",
-                "auth": "basic"
-              }
-            ]
-          }
-        ]
-      },
-      "tag": "user-1d16090f-eb64-4cc9-95e5-f9b482d90d4d"
-    },
-    {
-      "protocol": "http",
-      "settings": {
-        "servers": [
-          {
-            "address": "127.0.0.1",
-            "port": 8888,
-            "users": [
-              {
-                "user": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
-                "pass": "x",
-                "auth": "basic"
-              }
-            ]
-          }
-        ]
-      },
-      "tag": "user-960f001f-d065-410e-8a0d-c8aa2af4fe42"
+      "tag": "block",
+      "protocol": "blackhole"
     }
   ],
   "routing": {
-    "domainStrategy": "IPIfNonMatch",
+    "domainStrategy": "AsIs",
     "rules": [
       {
         "type": "field",
-        "outboundTag": "dns-out",
-        "network": "udp",
-        "port": 53
-      },
-      {
-        "type": "field",
-        "inboundTag": [
-          "vless-cascade"
-        ],
-        "outboundTag": "cascade-to-server2"
-      },
-      {
-        "type": "field",
-        "inboundTag": [
-          "vless-single"
-        ],
-        "email": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
-        "outboundTag": "user-74b741"
-      },
-      {
-        "type": "field",
-        "inboundTag": [
-          "vless-single"
-        ],
-        "ip": [
-          "0.0.0.0/0",
-          "::/0"
-        ],
-        "outboundTag": "user-74b741"
-      },
-      {
-        "type": "field",
-        "inboundTag": [
-          "socks-in"
-        ],
-        "outboundTag": "user-74b741"
-      },
-      {
-        "type": "field",
-        "inboundTag": [
-          "vless-single"
-        ],
-        "email": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d@vpn",
-        "outboundTag": "user-1d16090f-eb64-4cc9-95e5-f9b482d90d4d"
-      },
-      {
-        "type": "field",
-        "inboundTag": [
-          "vless-single"
-        ],
-        "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42@vpn",
-        "outboundTag": "user-960f001f-d065-410e-8a0d-c8aa2af4fe42"
+        "ip": ["geoip:private"],
+        "outboundTag": "block"
       }
     ]
   },
   "policy": {
     "levels": {
       "0": {
-        "conn": 5
+        "handshake": 4,
+        "connIdle": 300,
+        "uplinkOnly": 0,
+        "downlinkOnly": 0
       }
     }
   }
