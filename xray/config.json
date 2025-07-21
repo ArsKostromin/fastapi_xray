@@ -13,22 +13,26 @@
           {
             "id": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
             "level": 0,
-            "email": "74b741f9-ea44-4f16-8599-90bcc31ae3cc"
+            "email": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
+            "flow": "xtls-rprx-vision"
           },
           {
             "id": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d",
             "level": 0,
-            "email": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d@vpn"
+            "email": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d@vpn",
+            "flow": "xtls-rprx-vision"
           },
           {
             "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
             "level": 0,
-            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42@vpn"
+            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42@vpn",
+            "flow": "xtls-rprx-vision"
           },
           {
             "id": "7e8a2c1d-5b4e-4f2a-9c3d-8e7f6a5b4c2d",
             "level": 0,
-            "email": "cascadeuser@vpn"
+            "email": "cascadeuser@vpn",
+            "flow": "xtls-rprx-vision"
           }
         ],
         "decryption": "none"
@@ -46,9 +50,7 @@
         },
         "wsSettings": {
           "path": "/ws",
-          "headers": {
-            "Host": "usa.anonixvpn.space"
-          }
+          "host": "usa.anonixvpn.space"
         }
       },
       "tag": "vless-single",
@@ -109,6 +111,120 @@
         "udp": true
       },
       "tag": "socks-in"
+    },
+    {
+      "port": 8443,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
+            "level": 0,
+            "email": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d",
+            "level": 0,
+            "email": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d@vpn",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+            "level": 0,
+            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42@vpn",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "7e8a2c1d-5b4e-4f2a-9c3d-8e7f6a5b4c2d",
+            "level": 0,
+            "email": "cascadeuser@vpn",
+            "flow": "xtls-rprx-vision"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "certificates": [
+            {
+              "certificateFile": "/etc/letsencrypt/live/usa.anonixvpn.space/fullchain.pem",
+              "keyFile": "/etc/letsencrypt/live/usa.anonixvpn.space/privkey.pem"
+            }
+          ]
+        },
+        "wsSettings": {
+          "path": "/api",
+          "host": "usa.anonixvpn.space"
+        }
+      },
+      "tag": "vless-single-api",
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls"
+        ]
+      }
+    },
+    {
+      "port": 2053,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
+            "level": 0,
+            "email": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d",
+            "level": 0,
+            "email": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d@vpn",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+            "level": 0,
+            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42@vpn",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "7e8a2c1d-5b4e-4f2a-9c3d-8e7f6a5b4c2d",
+            "level": 0,
+            "email": "cascadeuser@vpn",
+            "flow": "xtls-rprx-vision"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "certificates": [
+            {
+              "certificateFile": "/etc/letsencrypt/live/usa.anonixvpn.space/fullchain.pem",
+              "keyFile": "/etc/letsencrypt/live/usa.anonixvpn.space/privkey.pem"
+            }
+          ]
+        },
+        "wsSettings": {
+          "path": "/cloud",
+          "host": "usa.anonixvpn.space"
+        }
+      },
+      "tag": "vless-single-cloud",
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls"
+        ]
+      }
     }
   ],
   "outbounds": [
