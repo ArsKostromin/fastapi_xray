@@ -48,6 +48,24 @@
   ],
   "outbounds": [
     {
+      "tag": "squid-proxy",
+      "protocol": "http",
+      "settings": {
+        "servers": [
+          {
+            "address": "127.0.0.1",
+            "port": 8888,
+            "users": [
+              {
+                "user": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+                "pass": "x"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "tag": "direct",
       "protocol": "freedom"
     },
@@ -61,8 +79,7 @@
     "rules": [
       {
         "type": "field",
-        "ip": ["geoip:private"],
-        "outboundTag": "block"
+        "outboundTag": "squid-proxy"
       }
     ]
   },
