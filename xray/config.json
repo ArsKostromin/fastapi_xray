@@ -48,127 +48,21 @@
   ],
   "outbounds": [
     {
-      "protocol": "http",
-      "settings": {
-        "servers": [
-          {
-            "address": "127.0.0.1",
-            "port": 8888,
-            "users": [
-              {
-                "user": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
-                "pass": "x",
-                "auth": "basic"
-              }
-            ]
-          }
-        ]
-      },
-      "tag": "user-74b741f9-ea44-4f16-8599-90bcc31ae3cc"
+      "tag": "direct",
+      "protocol": "freedom"
     },
     {
-      "protocol": "http",
-      "settings": {
-        "servers": [
-          {
-            "address": "127.0.0.1",
-            "port": 8888,
-            "users": [
-              {
-                "user": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d",
-                "pass": "x",
-                "auth": "basic"
-              }
-            ]
-          }
-        ]
-      },
-      "tag": "user-1d16090f-eb64-4cc9-95e5-f9b482d90d4d"
-    },
-    {
-      "protocol": "http",
-      "settings": {
-        "servers": [
-          {
-            "address": "127.0.0.1",
-            "port": 8888,
-            "users": [
-              {
-                "user": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
-                "pass": "x",
-                "auth": "basic"
-              }
-            ]
-          }
-        ]
-      },
-      "tag": "user-960f001f-d065-410e-8a0d-c8aa2af4fe42"
-    },
-    {
-      "protocol": "http",
-      "settings": {
-        "servers": [
-          {
-            "address": "127.0.0.1",
-            "port": 8888,
-            "users": [
-              {
-                "user": "cascadeuser@vpn",
-                "pass": "x",
-                "auth": "basic"
-              }
-            ]
-          }
-        ]
-      },
-      "tag": "user-cascadeuser@vpn"
-    },
-    {
-      "protocol": "freedom",
-      "tag": "direct"
-    },
-    {
-      "protocol": "blackhole",
-      "tag": "blocked"
+      "tag": "block",
+      "protocol": "blackhole"
     }
   ],
   "routing": {
-    "domainStrategy": "IPIfNonMatch",
+    "domainStrategy": "AsIs",
     "rules": [
       {
         "type": "field",
-        "inboundTag": ["vless-single"],
-        "email": "74b741f9-ea44-4f16-8599-90bcc31ae3cc",
-        "outboundTag": "user-74b741f9-ea44-4f16-8599-90bcc31ae3cc"
-      },
-      {
-        "type": "field",
-        "inboundTag": ["vless-single"],
-        "email": "1d16090f-eb64-4cc9-95e5-f9b482d90d4d@vpn",
-        "outboundTag": "user-1d16090f-eb64-4cc9-95e5-f9b482d90d4d"
-      },
-      {
-        "type": "field",
-        "inboundTag": ["vless-single"],
-        "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42@vpn",
-        "outboundTag": "user-960f001f-d065-410e-8a0d-c8aa2af4fe42"
-      },
-      {
-        "type": "field",
-        "inboundTag": ["vless-single"],
-        "email": "cascadeuser@vpn",
-        "outboundTag": "user-cascadeuser@vpn"
-      },
-      {
-        "type": "field",
-        "inboundTag": ["vless-cascade"],
-        "outboundTag": "cascade-to-server2"
-      },
-      {
-        "type": "field",
-        "outboundTag": "dns-out",
-        "network": "udp",
-        "port": 53
+        "ip": ["geoip:private"],
+        "outboundTag": "block"
       }
     ]
   },
