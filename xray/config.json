@@ -108,6 +108,7 @@
   },
   "stats": {},
   "api": {
+    "tag": "api",
     "services": [
       "StatsService"
     ]
