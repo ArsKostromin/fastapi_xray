@@ -42,7 +42,20 @@
       "sniffing": {
         "enabled": true,
         "routeOnly": false,
-        "destOverride": ["http", "tls", "quic"]
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      }
+    },
+    {
+      "tag": "api",
+      "port": 10085,
+      "listen": "127.0.0.1",
+      "protocol": "dokodemo-door",
+      "settings": {
+        "address": "127.0.0.1"
       }
     }
   ],
@@ -61,7 +74,16 @@
     "rules": [
       {
         "type": "field",
-        "ip": ["geoip:private"],
+        "inboundTag": [
+          "api"
+        ],
+        "outboundTag": "api"
+      },
+      {
+        "type": "field",
+        "ip": [
+          "geoip:private"
+        ],
         "outboundTag": "block"
       }
     ]
@@ -72,8 +94,22 @@
         "handshake": 4,
         "connIdle": 300,
         "uplinkOnly": 0,
-        "downlinkOnly": 0
+        "downlinkOnly": 0,
+        "statsUserUplink": true,
+        "statsUserDownlink": true
       }
+    },
+    "system": {
+      "statsInboundUplink": true,
+      "statsInboundDownlink": true,
+      "statsOutboundUplink": true,
+      "statsOutboundDownlink": true
     }
+  },
+  "stats": {},
+  "api": {
+    "services": [
+      "StatsService"
+    ]
   }
 }
