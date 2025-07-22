@@ -11,16 +11,6 @@ services:
       - ./logs/xray:/logs/xray
     network_mode: host
 
-  squid:
-    image: ubuntu/squid
-    container_name: squid
-    restart: unless-stopped
-    volumes:
-      - ./squid/squid.conf:/etc/squid/squid.conf:ro
-      - ./squid/passwd:/etc/squid/passwd:ro
-      - ./logs/squid:/logs/squid
-    network_mode: host
-
   fastapi:
     build:
       context: .
@@ -39,9 +29,6 @@ services:
 
       - ./logs/xray/access.log:/logs/xray/access.log:ro
       - ./logs/xray/error.log:/logs/xray/error.log:ro
-      - ./logs/squid/access.log:/logs/squid/access.log:ro
-
-      - ./squid/passwd:/etc/squid/passwd:rw
     environment:
       - PYTHONUNBUFFERED=1
       
