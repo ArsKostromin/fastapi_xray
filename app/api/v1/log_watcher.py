@@ -130,3 +130,5 @@ class XrayLogTailer:
 
         if not self.task:
             self.task = asyncio.create_task(self.tail_log())
+
+tailer = XrayLogTailer()
