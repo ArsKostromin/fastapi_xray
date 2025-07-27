@@ -17,6 +17,8 @@ class XrayLogTailer:
         self.task = None
         self.running = False
         self.squid_log_path = "/logs/squid/access.log"
+        self.server_ip = None
+
 
     def stop(self):
         self.running = False
@@ -85,13 +87,20 @@ class XrayLogTailer:
                     # Найдём статус и байты из squid (асинхронно, с учётом времени)
                     status, bytes_sent = await self.find_squid_info(uuid, domain, dt)
 
+                    # Новая логика: если статус найден — accepted, иначе failed
+                    if status is not None:
+                        status_out = "accepted"
+                    else:
+                        status_out = "failed"
+
                     payload = {
                         "uuid": uuid,
                         "ip": ip,
                         "destination": domain,
                         "timestamp": timestamp_iso,
-                        "status": status,
-                        "bytes_sent": bytes_sent
+                        "status": status_out,
+                        "bytes_sent": bytes_sent,
+                        "server_ip": self.server_ip
                     }
 
                     print(f"📤 Отправляем лог: {payload}")
@@ -106,7 +115,18 @@ class XrayLogTailer:
         await self.parse_xray_log()
 
     async def start(self):
+        if not hasattr(self, "server_ip"):
+            self.server_ip = None
+
+        if not self.server_ip:
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get("https://api.ipify.org") as resp:
+                        self.server_ip = await resp.text()
+                        print(f"🌍 Внешний IP сервера: {self.server_ip}")
+            except Exception as e:
+                print(f"❌ Не удалось получить IP: {e}")
+                self.server_ip = "unknown"
+
         if not self.task:
             self.task = asyncio.create_task(self.tail_log())
-
-tailer = XrayLogTailer()
