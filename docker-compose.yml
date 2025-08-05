@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   xray:
     image: teddysun/xray
@@ -29,6 +27,11 @@ services:
 
       - ./logs/xray/access.log:/logs/xray/access.log:ro
       - ./logs/xray/error.log:/logs/xray/error.log:ro
+
+      - ./squid/passwd:/etc/squid/passwd:rw  # ← ВОТ ЭТА СТРОКА добавлена
     environment:
       - PYTHONUNBUFFERED=1
-      
+
+volumes:
+  # если хочешь использовать named volumes
+  # squid_passwd: # но тут ты используешь bind-монтирование, так что не нужно
