@@ -153,13 +153,13 @@ async def create_vless_user(data: VLESSRequest):
         await restart_xray()
 
         # Ссылка
-        domain = "indonesia.server2.anonixvpn.space"
+        domain = "indonesia.admin.byebyefbi.com"
         port = 443
         path = "/vless"
 
         vless_link = (
             f"vless://{uid}@{domain}:{port}"
-            f"?encryption=none&security=tls&type=ws&host=indonesia.server2.anonixvpn.space&path=%2Fws#indonesia"
+            f"?encryption=none&security=tls&type=ws&host=indonesia.admin.byebyefbi.com&path=%2Fws#indonesia"
         )
 
         logger.info(f"VLESS ссылка сгенерирована: {vless_link}")

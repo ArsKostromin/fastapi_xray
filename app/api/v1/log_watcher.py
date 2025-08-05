@@ -10,7 +10,7 @@ from collections import deque
 # SQUID_LOG_PATH = "/logs/squid/access.log"
 
 XRAY_LOG_PATH = "/logs/xray/access.log"
-CENTRAL_LOG_SERVER = "https://server2.anonixvpn.space/proxylogs/receive-log/"
+CENTRAL_LOG_SERVER = "https://admin.byebyefbi.com/proxylogs/receive-log/"
 
 class XrayLogTailer:
     def __init__(self):
