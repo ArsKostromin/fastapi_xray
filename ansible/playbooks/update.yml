@@ -1,0 +1,82 @@
+---
+- name: Update FastAPI Xray VPN Service
+  hosts: vpn_servers
+  become: yes
+  gather_facts: yes
+  
+  tasks:
+    - name: Pull latest application code
+      git:
+        repo: "{{ git_repository | default('https://github.com/your-repo/fastapi_xray.git') }}"
+        dest: /tmp/fastapi_xray
+        version: "{{ git_branch | default('main') }}"
+        force: yes
+      tags: [update, git]
+
+    - name: Stop services for update
+      systemd:
+        name: "{{ item }}"
+        state: stopped
+      loop:
+        - fastapi
+        - xray
+        - squid
+      tags: [update, services]
+
+    - name: Backup current configuration
+      archive:
+        path:
+          - /opt/fastapi_xray
+        dest: "/opt/backups/fastapi_xray_backup_{{ ansible_date_time.epoch }}.tar.gz"
+        format: gz
+      tags: [update, backup]
+
+    - name: Copy updated application files
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: root
+        group: root
+        mode: "{{ item.mode | default('0644') }}"
+        remote_src: yes
+      loop:
+        - { src: "/tmp/fastapi_xray/app", dest: "/opt/fastapi_xray/app", mode: "0755" }
+        - { src: "/tmp/fastapi_xray/requirements.txt", dest: "/opt/fastapi_xray/requirements.txt" }
+        - { src: "/tmp/fastapi_xray/Dockerfile", dest: "/opt/fastapi_xray/Dockerfile" }
+        - { src: "/tmp/fastapi_xray/docker-compose.yml", dest: "/opt/fastapi_xray/docker-compose.yml" }
+        - { src: "/tmp/fastapi_xray/restart_xray.sh", dest: "/opt/fastapi_xray/restart_xray.sh", mode: "0755" }
+      tags: [update, files]
+
+    - name: Rebuild and restart FastAPI container
+      docker_compose:
+        project_src: /opt/fastapi_xray
+        build: yes
+        state: present
+        recreate: always
+      tags: [update, fastapi]
+
+    - name: Restart Xray service
+      systemd:
+        name: xray
+        state: restarted
+      tags: [update, xray]
+
+    - name: Restart Squid service
+      systemd:
+        name: squid
+        state: restarted
+      tags: [update, squid]
+
+    - name: Wait for services to be ready
+      wait_for:
+        port: "{{ fastapi_port }}"
+        host: "127.0.0.1"
+        delay: 10
+        timeout: 60
+      tags: [update, health]
+
+    - name: Clean up temporary files
+      file:
+        path: /tmp/fastapi_xray
+        state: absent
+      tags: [update, cleanup]

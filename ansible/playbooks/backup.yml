@@ -1,0 +1,72 @@
+---
+- name: Backup FastAPI Xray VPN Service
+  hosts: vpn_servers
+  become: yes
+  gather_facts: yes
+  
+  tasks:
+    - name: Create backup directory
+      file:
+        path: /opt/backups
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      tags: [backup, directories]
+
+    - name: Create timestamped backup
+      archive:
+        path:
+          - /opt/fastapi_xray
+          - /etc/letsencrypt
+          - /etc/nginx/sites-available/fastapi
+          - /etc/nginx/sites-enabled/fastapi
+        dest: "/opt/backups/fastapi_xray_full_backup_{{ ansible_date_time.epoch }}.tar.gz"
+        format: gz
+      tags: [backup, archive]
+
+    - name: Backup Xray configuration
+      copy:
+        src: "{{ xray_config_path }}"
+        dest: "/opt/backups/xray_config_{{ ansible_date_time.epoch }}.json"
+        remote_src: yes
+      tags: [backup, config]
+
+    - name: Backup Squid configuration
+      copy:
+        src: "{{ squid_config_path }}"
+        dest: "/opt/backups/squid_config_{{ ansible_date_time.epoch }}.conf"
+        remote_src: yes
+      tags: [backup, config]
+
+    - name: Backup Squid password file
+      copy:
+        src: "{{ squid_passwd_path }}"
+        dest: "/opt/backups/squid_passwd_{{ ansible_date_time.epoch }}"
+        remote_src: yes
+      tags: [backup, config]
+
+    - name: Clean old backups
+      find:
+        paths: /opt/backups
+        patterns: "*.tar.gz"
+        age: "{{ backup_retention_days }}d"
+      register: old_backups
+      tags: [backup, cleanup]
+
+    - name: Remove old backup files
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ old_backups.files }}"
+      when: old_backups.files | length > 0
+      tags: [backup, cleanup]
+
+    - name: Set backup file permissions
+      file:
+        path: "/opt/backups"
+        owner: root
+        group: root
+        mode: '0700'
+        recurse: yes
+      tags: [backup, permissions]

@@ -1,0 +1,11 @@
+---
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+  tags: [fastapi, handlers]
+
+- name: restart fastapi
+  systemd:
+    name: fastapi
+    state: restarted
+  tags: [fastapi, handlers]

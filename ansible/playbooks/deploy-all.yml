@@ -1,0 +1,124 @@
+---
+- name: Deploy FastAPI Xray VPN Service to All Servers
+  hosts: vpn_servers
+  become: yes
+  gather_facts: yes
+  
+  pre_tasks:
+    - name: Update system packages
+      apt:
+        update_cache: yes
+        upgrade: safe
+      tags: [system, packages]
+    
+    - name: Install essential packages
+      apt:
+        name:
+          - curl
+          - wget
+          - git
+          - unzip
+          - htop
+          - ufw
+          - fail2ban
+          - apache2-utils
+        state: present
+      tags: [system, packages]
+
+  roles:
+    - role: docker
+      tags: [docker]
+    
+    - role: nginx
+      tags: [nginx]
+    
+    - role: ssl
+      tags: [ssl]
+    
+    - role: firewall
+      tags: [firewall]
+    
+    - role: xray
+      tags: [xray]
+    
+    - role: fastapi
+      tags: [fastapi]
+    
+    - role: squid
+      tags: [squid]
+
+  post_tasks:
+    - name: Create application directory
+      file:
+        path: /opt/fastapi_xray
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      tags: [deployment]
+
+    - name: Copy application files
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: root
+        group: root
+        mode: "{{ item.mode | default('0644') }}"
+      loop:
+        - { src: "../../app", dest: "/opt/fastapi_xray/app", mode: "0755" }
+        - { src: "../../requirements.txt", dest: "/opt/fastapi_xray/requirements.txt" }
+        - { src: "../../Dockerfile", dest: "/opt/fastapi_xray/Dockerfile" }
+        - { src: "../../docker-compose.yml", dest: "/opt/fastapi_xray/docker-compose.yml" }
+        - { src: "../../restart_xray.sh", dest: "/opt/fastapi_xray/restart_xray.sh", mode: "0755" }
+      tags: [deployment]
+
+    - name: Create logs directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      loop:
+        - /opt/fastapi_xray/logs/xray
+        - /opt/fastapi_xray/logs/squid
+      tags: [deployment]
+
+    - name: Start services with Docker Compose v2
+      community.docker.docker_compose_v2:
+        project_src: /opt/fastapi_xray
+        state: present
+        recreate: always
+      tags: [deployment]
+
+    - name: Wait for services to be ready
+      wait_for:
+        port: "{{ fastapi_port }}"
+        host: "127.0.0.1"
+        delay: 10
+        timeout: 60
+      tags: [deployment]
+
+    - name: Check service status
+      systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - docker
+        - nginx
+        - fail2ban
+      tags: [deployment]
+
+    - name: Display server information
+      debug:
+        msg: |
+          Server: {{ inventory_hostname }}
+          Country: {{ country }}
+          Location: {{ location }}
+          Domain: {{ domain }}
+          IP: {{ ansible_host }}
+          FastAPI Port: {{ fastapi_port }}
+          Xray Port: {{ xray_port }}
+          Squid Port: {{ squid_port }}
+      tags: [deployment]

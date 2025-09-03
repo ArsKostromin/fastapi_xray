@@ -1,0 +1,35 @@
+---
+# Global variables for all hosts
+
+# System settings
+timezone: "UTC"
+locale: "en_US.UTF-8"
+
+# Docker settings
+docker_compose_version: "2.24.0"
+docker_data_root: "/var/lib/docker"
+
+# Application settings
+app_name: "fastapi_xray"
+app_user: "root"
+app_group: "root"
+app_home: "/opt/fastapi_xray"
+
+# Logging settings
+log_level: "info"
+log_retention_days: 30
+log_max_size: "100M"
+
+# Security settings
+fail2ban_enabled: true
+ufw_enabled: true
+ssl_enabled: true
+
+# Backup settings
+backup_enabled: true
+backup_retention_days: 7
+backup_schedule: "0 2 * * *"  # Daily at 2 AM
+
+# Monitoring settings
+monitoring_enabled: true
+health_check_interval: 30

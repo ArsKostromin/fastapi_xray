@@ -5,7 +5,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./xray/config.json:/etc/xray/config.json:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
       - ./logs/xray:/logs/xray
     network_mode: host
 

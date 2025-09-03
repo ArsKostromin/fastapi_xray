@@ -1,0 +1,11 @@
+---
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+  tags: [xray, handlers]
+
+- name: restart xray
+  systemd:
+    name: xray
+    state: restarted
+  tags: [xray, handlers]

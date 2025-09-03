@@ -1,0 +1,44 @@
+---
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: present
+  tags: [nginx, packages]
+
+- name: Start and enable Nginx service
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes
+  tags: [nginx, service]
+
+- name: Create Nginx configuration for FastAPI (HTTP only)
+  template:
+    src: fastapi-http.conf.j2
+    dest: /etc/nginx/sites-available/fastapi
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart nginx
+  tags: [nginx, config]
+
+- name: Enable FastAPI site
+  file:
+    src: /etc/nginx/sites-available/fastapi
+    dest: /etc/nginx/sites-enabled/fastapi
+    state: link
+  notify: restart nginx
+  tags: [nginx, config]
+
+- name: Remove default Nginx site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: restart nginx
+  tags: [nginx, config]
+
+- name: Test Nginx configuration
+  command: nginx -t
+  register: nginx_test
+  changed_when: false
+  tags: [nginx, config]

@@ -1,0 +1,4 @@
+# Squid password file
+# Format: username:password
+# Use htpasswd to generate passwords: htpasswd -c passwd username
+{{ squid_username | default('admin') }}:{{ squid_password | default('$apr1$admin$password_hash_here') }}

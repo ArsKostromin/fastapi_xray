@@ -1,0 +1,90 @@
+---
+- name: Restore FastAPI Xray VPN Service
+  hosts: vpn_servers
+  become: yes
+  gather_facts: yes
+  
+  vars_prompt:
+    - name: backup_file
+      prompt: "Enter the backup file path (e.g., /opt/backups/fastapi_xray_full_backup_1234567890.tar.gz)"
+      private: no
+      default: ""
+  
+  tasks:
+    - name: Check if backup file exists
+      stat:
+        path: "{{ backup_file }}"
+      register: backup_stat
+      tags: [restore, validation]
+
+    - name: Fail if backup file doesn't exist
+      fail:
+        msg: "Backup file {{ backup_file }} does not exist"
+      when: not backup_stat.stat.exists
+      tags: [restore, validation]
+
+    - name: Stop all services
+      systemd:
+        name: "{{ item }}"
+        state: stopped
+      loop:
+        - fastapi
+        - xray
+        - squid
+        - nginx
+      tags: [restore, services]
+
+    - name: Create current backup before restore
+      archive:
+        path:
+          - /opt/fastapi_xray
+        dest: "/opt/backups/pre_restore_backup_{{ ansible_date_time.epoch }}.tar.gz"
+        format: gz
+      tags: [restore, backup]
+
+    - name: Extract backup
+      unarchive:
+        src: "{{ backup_file }}"
+        dest: /
+        remote_src: yes
+      tags: [restore, extract]
+
+    - name: Restore file permissions
+      file:
+        path: /opt/fastapi_xray
+        owner: root
+        group: root
+        mode: '0755'
+        recurse: yes
+      tags: [restore, permissions]
+
+    - name: Start services
+      systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - nginx
+        - xray
+        - squid
+        - fastapi
+      tags: [restore, services]
+
+    - name: Wait for services to be ready
+      wait_for:
+        port: "{{ fastapi_port }}"
+        host: "127.0.0.1"
+        delay: 10
+        timeout: 60
+      tags: [restore, health]
+
+    - name: Verify service status
+      systemd:
+        name: "{{ item }}"
+      register: service_status
+      loop:
+        - nginx
+        - xray
+        - squid
+        - fastapi
+      tags: [restore, verification]

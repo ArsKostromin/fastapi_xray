@@ -5,9 +5,10 @@ services:
     image: teddysun/xray
     container_name: xray-server2
     restart: unless-stopped
+    command: ["/usr/bin/xray", "-config", "/etc/xray/config_server2.json"]
     volumes:
-      - ./xray/config_server2.json:/etc/xray/config.json:ro
-      - ./logs/xray:/logs/xray
+      - ./xray:/etc/xray:ro
+      - ./logs/xray:/logs/xray:ro
     ports:
       - "8443:8443"
     network_mode: host
@@ -23,7 +24,6 @@ services:
       - ./app:/app/app
       - ./xray/config_server2.json:/usr/local/etc/xray/config.json:rw
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./logs/xray/access.log:/logs/xray/access.log:ro
-      - ./logs/xray/error.log:/logs/xray/error.log:ro
+      - ./logs/xray:/logs/xray:ro
     environment:
       - PYTHONUNBUFFERED=1 

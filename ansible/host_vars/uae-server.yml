@@ -1,0 +1,21 @@
+---
+# UAE Server Configuration
+country: "UAE"
+location: "United Arab Emirates"
+domain: "176.97.67.100"
+ssl_email: "admin@176.97.67.100"
+
+# Xray specific settings for UAE
+xray_client_id: "960f001f-d065-410e-8a0d-c8aa2af4fe42"
+xray_dest: "google.com:443"
+xray_server_name: "google.com"
+xray_private_key: "MKmOvMSCrWxf0ptC2s5cYpp-ddFcjNN2J8vDWcWtWGM"
+xray_public_key: "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY"
+xray_short_id: "f6213f68"
+
+# Squid settings
+squid_username: "uae_user"
+squid_password: "$apr1$uae$password_hash_here"
+
+# Timezone
+timezone: "Asia/Dubai"

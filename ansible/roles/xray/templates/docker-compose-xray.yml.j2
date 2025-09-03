@@ -1,0 +1,15 @@
+services:
+  xray:
+    image: teddysun/xray
+    container_name: xray
+    restart: unless-stopped
+    volumes:
+      - {{ xray_config_path }}:/etc/xray/config.json:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - {{ xray_logs_path }}:/logs/xray
+    network_mode: host
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

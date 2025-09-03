@@ -1,0 +1,16 @@
+services:
+  squid:
+    image: ubuntu/squid:latest
+    container_name: squid
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:{{ squid_port }}:{{ squid_port }}"
+    volumes:
+      - {{ squid_config_path }}:/etc/squid/squid.conf:ro
+      - {{ squid_passwd_path }}:/etc/squid/passwd:ro
+      - {{ squid_logs_path }}:/logs/squid
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

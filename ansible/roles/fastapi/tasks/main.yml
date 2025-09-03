@@ -1,0 +1,61 @@
+---
+- name: Create FastAPI application directory
+  file:
+    path: "{{ fastapi_app_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags: [fastapi, directories]
+
+- name: Copy FastAPI application files
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "{{ item.mode | default('0644') }}"
+  loop:
+    - { src: "../../../app", dest: "{{ fastapi_app_path }}" }
+    - { src: "../../../requirements.txt", dest: "{{ fastapi_requirements_path }}" }
+    - { src: "../../../Dockerfile", dest: "/opt/fastapi_xray/Dockerfile" }
+    - { src: "../../../restart_xray.sh", dest: "/opt/fastapi_xray/restart_xray.sh", mode: "0755" }
+  tags: [fastapi, files]
+
+- name: Create Docker Compose configuration for FastAPI
+  template:
+    src: docker-compose-fastapi.yml.j2
+    dest: /opt/fastapi_xray/docker-compose-fastapi.yml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart fastapi
+  tags: [fastapi, docker]
+
+- name: Create FastAPI systemd service
+  template:
+    src: fastapi.service.j2
+    dest: /etc/systemd/system/fastapi.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - reload systemd
+    - restart fastapi
+  tags: [fastapi, service]
+
+- name: Start FastAPI service
+  systemd:
+    name: fastapi
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  tags: [fastapi, service]
+
+- name: Wait for FastAPI to be ready
+  wait_for:
+    port: "{{ fastapi_port }}"
+    host: "127.0.0.1"
+    delay: 10
+    timeout: 60
+  tags: [fastapi, health]
