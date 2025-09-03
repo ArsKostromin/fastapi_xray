@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   xray:
     image: teddysun/xray
@@ -5,6 +7,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./xray/config.json:/etc/xray/config.json:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
       - ./logs/xray:/logs/xray
     network_mode: host
 
@@ -18,19 +21,11 @@ services:
     volumes:
       - ./app:/app/app
       - ./restart_xray.sh:/app/restart_xray.sh:rw
-
       - ./xray/config.json:/usr/local/etc/xray/config.json:rw
-
       - /etc/systemd/system:/etc/systemd/system:ro
       - /var/run/docker.sock:/var/run/docker.sock
-
       - ./logs/xray/access.log:/logs/xray/access.log:ro
       - ./logs/xray/error.log:/logs/xray/error.log:ro
-
-      - ./squid/passwd:/etc/squid/passwd:rw  # ← ВОТ ЭТА СТРОКА добавлена
+      - ./squid/passwd:/etc/squid/passwd:rw
     environment:
       - PYTHONUNBUFFERED=1
-
-# volumes:
-#   # если хочешь использовать named volumes
-#   # squid_passwd: # но тут ты используешь bind-монтирование, так что не нужно
