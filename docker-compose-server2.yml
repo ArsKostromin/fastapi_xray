@@ -7,11 +7,10 @@ services:
     restart: unless-stopped
     command: ["/usr/bin/xray", "-config", "/etc/xray/config_server2.json"]
     volumes:
-      - ./xray:/etc/xray:ro
-      - ./logs/xray:/logs/xray:ro
+      - ./xray/config_server2.json:/etc/xray/config_server2.json:ro
+      - ./logs/xray:/logs/xray   # без ro, чтобы писать логи
     ports:
-      - "8443:8443"
-    network_mode: host
+      - "8443:8443"              # наружу пробрасываем порт для reality
 
   fastapi-server2:
     build:
@@ -19,11 +18,11 @@ services:
     container_name: fastapi-server2
     restart: unless-stopped
     ports:
-      - "8082:8081"
+      - "8082:8081"              # наружу проброс API
     volumes:
       - ./app:/app/app
-      - ./xray/config_server2.json:/usr/local/etc/xray/config.json:rw
+      - ./xray/config_server2.json:/usr/local/etc/xray/config.json:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - ./logs/xray:/logs/xray:ro
     environment:
-      - PYTHONUNBUFFERED=1 
+      - PYTHONUNBUFFERED=1
