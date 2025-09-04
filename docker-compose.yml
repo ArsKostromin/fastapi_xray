@@ -9,7 +9,9 @@ services:
       - ./xray/config.json:/etc/xray/config.json:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - ./logs/xray:/logs/xray
-    network_mode: host
+    ports:
+      - "80:80"
+      - "443:443"
 
   fastapi:
     build:
