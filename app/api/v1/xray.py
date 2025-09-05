@@ -80,66 +80,19 @@ async def create_vless_user(data: VLESSRequest):
         config = json.loads(config_data)
 
         clients = config["inbounds"][0]["settings"]["clients"]
-        outbounds = config.get("outbounds", [])
-        routing_rules = config.get("routing", {}).get("rules", [])
 
         if any(client["id"] == uid for client in clients):
             logger.warning(f"UUID уже существует: {uid}")
             return VLESSResponse(success=False, message="UUID already exists")
 
-        # Добавляем клиента
-        email = f"{uid}@vpn"
+        # Добавляем клиента (как у существующего пользователя)
         clients.append({
             "id": uid,
             "level": 0,
-            "email": email
+            "email": uid,
+            "flow": "xtls-rprx-vision"
         })
         logger.info(f"Клиент {uid} добавлен")
-
-        # Добавляем outbound (если ещё не существует)
-        outbound_tag = f"user-{uid}"
-        new_outbound = {
-            "protocol": "http",
-            "settings": {
-                "servers": [
-                    {
-                        "address": "127.0.0.1",
-                        "port": 8888,
-                        "users": [
-                            {
-                                "user": uid,
-                                "pass": SQUID_DEFAULT_PASSWORD,
-                                "auth": "basic"
-                            }
-                        ]
-                    }
-                ]
-            },
-            "tag": outbound_tag
-        }
-
-        if any(o.get("tag") == outbound_tag for o in outbounds):
-            logger.warning(f"Outbound с тегом {outbound_tag} уже существует")
-        else:
-            outbounds.append(new_outbound)
-            logger.info(f"Outbound {outbound_tag} добавлен")
-
-        config["outbounds"] = outbounds
-
-        # Добавляем routing rule (если ещё не существует)
-        if "routing" not in config:
-            config["routing"] = {"domainStrategy": "AsIs", "rules": []}
-
-        if not any(rule.get("email") == email for rule in config["routing"]["rules"]):
-            config["routing"]["rules"].append({
-                "type": "field",
-                "inboundTag": ["vless-single"],
-                "email": email,
-                "outboundTag": outbound_tag
-            })
-            logger.info(f"Правило маршрутизации для {email} добавлено")
-        else:
-            logger.warning(f"Routing правило для {email} уже существует")
 
         # Сохраняем конфиг
         async with aiofiles.open(XRAY_CONFIG_PATH, "w") as f:
@@ -192,13 +145,6 @@ async def delete_vless_user(data: VLESSRequest):
             return VLESSResponse(success=False, message="UUID not found")
 
         config["inbounds"][0]["settings"]["clients"] = clients
-        config["outbounds"] = [
-            o for o in config.get("outbounds", [])
-            if not any(u.get("user") == uid for s in o.get("settings", {}).get("servers", []) for u in s.get("users", []))
-        ]
-        config["routing"]["rules"] = [
-            r for r in config["routing"]["rules"] if r.get("email") != f"{uid}@vpn"
-        ]
 
         async with aiofiles.open(XRAY_CONFIG_PATH, "w") as f:
             await f.write(json.dumps(config, indent=2))
