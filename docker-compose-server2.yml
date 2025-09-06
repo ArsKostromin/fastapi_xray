@@ -10,7 +10,7 @@ services:
       - ./xray/config_server2_hybrid.json:/etc/xray/config_server2_hybrid.json:ro
       - ./logs/xray:/logs/xray   # без ro, чтобы писать логи
     ports:
-      - "8443:8443"              # наружу пробрасываем порт для клиентов server2
+      - "443:443"                # наружу пробрасываем порт для клиентов server2
       - "9443:9443"              # наружу пробрасываем порт для серверных подключений server2
 
   fastapi-server2:
