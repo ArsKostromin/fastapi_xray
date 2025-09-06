@@ -111,7 +111,7 @@
         "vnext": [
           {
             "address": "5.180.45.191",
-            "port": 8443,
+            "port": 8444,
             "users": [
               {
                 "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
@@ -126,21 +126,7 @@
       },
       "streamSettings": {
         "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "dest": "www.cloudflare.com:443",
-          "xver": 0,
-          "serverNames": [
-            "www.cloudflare.com"
-          ],
-          "privateKey": "MKmOvMSCrWxf0ptC2s5cYpp-ddFcjNN2J8vDWcWtWGM",
-          "publicKey": "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY",
-          "shortIds": [
-            "f6213f68"
-          ],
-          "spiderX": "/"
-        }
+        "security": "none"
       }
     },
     {

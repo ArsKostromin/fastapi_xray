@@ -94,6 +94,27 @@
       }
     },
     {
+      "tag": "vless-server-server",
+      "port": 8444,
+      "listen": "0.0.0.0",
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+            "level": 0,
+            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+            "encryption": "none"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "none"
+      }
+    },
+    {
       "tag": "api",
       "port": 10085,
       "listen": "127.0.0.1",
@@ -141,6 +162,13 @@
         "type": "field",
         "inboundTag": [
           "reality-vless-servers"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "inboundTag": [
+          "vless-server-server"
         ],
         "outboundTag": "direct"
       }
