@@ -133,7 +133,13 @@
       {
         "type": "field",
         "inboundTag": [
-          "reality-vless-clients",
+          "reality-vless-clients"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "inboundTag": [
           "reality-vless-servers"
         ],
         "outboundTag": "direct"
