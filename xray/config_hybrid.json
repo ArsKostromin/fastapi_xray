@@ -153,6 +153,7 @@
           "serverNames": [
             "www.cloudflare.com"
           ],
+          "privateKey": "MKmOvMSCrWxf0ptC2s5cYpp-ddFcjNN2J8vDWcWtWGM",
           "publicKey": "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY",
           "shortIds": [
             "f6213f68"
