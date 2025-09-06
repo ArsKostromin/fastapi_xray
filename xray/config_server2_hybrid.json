@@ -6,51 +6,7 @@
   },
   "inbounds": [
     {
-      "tag": "reality-vless-clients",
-      "port": 443,
-      "listen": "0.0.0.0",
-      "protocol": "vless",
-      "settings": {
-        "clients": [
-          {
-            "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
-            "level": 0,
-            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
-            "flow": "xtls-rprx-vision"
-          }
-        ],
-        "decryption": "none"
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": false,
-          "dest": "www.cloudflare.com:443",
-          "xver": 0,
-          "serverNames": [
-            "www.cloudflare.com"
-          ],
-          "privateKey": "MKmOvMSCrWxf0ptC2s5cYpp-ddFcjNN2J8vDWcWtWGM",
-          "publicKey": "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY",
-          "shortIds": [
-            "f6213f68"
-          ],
-          "spiderX": "/"
-        }
-      },
-      "sniffing": {
-        "enabled": true,
-        "routeOnly": false,
-        "destOverride": [
-          "http",
-          "tls",
-          "quic"
-        ]
-      }
-    },
-    {
-      "tag": "reality-vless-servers",
+      "tag": "reality-vless-clients-server2",
       "port": 8443,
       "listen": "0.0.0.0",
       "protocol": "vless",
@@ -94,8 +50,52 @@
       }
     },
     {
-      "tag": "api",
-      "port": 10085,
+      "tag": "reality-vless-servers-server2",
+      "port": 9443,
+      "listen": "0.0.0.0",
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+            "level": 0,
+            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+            "flow": "xtls-rprx-vision"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "www.cloudflare.com:443",
+          "xver": 0,
+          "serverNames": [
+            "www.cloudflare.com"
+          ],
+          "privateKey": "MKmOvMSCrWxf0ptC2s5cYpp-ddFcjNN2J8vDWcWtWGM",
+          "publicKey": "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY",
+          "shortIds": [
+            "f6213f68"
+          ],
+          "spiderX": "/"
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "routeOnly": false,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      }
+    },
+    {
+      "tag": "api-server2",
+      "port": 10086,
       "listen": "127.0.0.1",
       "protocol": "dokodemo-door",
       "settings": {
@@ -104,6 +104,44 @@
     }
   ],
   "outbounds": [
+    {
+      "tag": "proxy-to-server1",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "5.180.45.191",
+            "port": 8443,
+            "users": [
+              {
+                "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+                "level": 0,
+                "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "www.cloudflare.com:443",
+          "xver": 0,
+          "serverNames": [
+            "www.cloudflare.com"
+          ],
+          "publicKey": "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY",
+          "shortIds": [
+            "f6213f68"
+          ],
+          "spiderX": "/"
+        }
+      }
+    },
     {
       "tag": "direct",
       "protocol": "freedom"
@@ -119,9 +157,9 @@
       {
         "type": "field",
         "inboundTag": [
-          "api"
+          "api-server2"
         ],
-        "outboundTag": "api"
+        "outboundTag": "api-server2"
       },
       {
         "type": "field",
@@ -133,8 +171,14 @@
       {
         "type": "field",
         "inboundTag": [
-          "reality-vless-clients",
-          "reality-vless-servers"
+          "reality-vless-clients-server2"
+        ],
+        "outboundTag": "proxy-to-server1"
+      },
+      {
+        "type": "field",
+        "inboundTag": [
+          "reality-vless-servers-server2"
         ],
         "outboundTag": "direct"
       }
@@ -160,10 +204,9 @@
   },
   "stats": {},
   "api": {
-    "tag": "api",
+    "tag": "api-server2",
     "services": [
       "StatsService"
     ]
   }
 }
-

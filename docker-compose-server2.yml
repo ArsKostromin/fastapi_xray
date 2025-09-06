@@ -5,12 +5,13 @@ services:
     image: teddysun/xray
     container_name: xray-server2
     restart: unless-stopped
-    command: ["/usr/bin/xray", "-config", "/etc/xray/config_server2.json"]
+    command: ["/usr/bin/xray", "-config", "/etc/xray/config_server2_hybrid.json"]
     volumes:
-      - ./xray/config_server2.json:/etc/xray/config_server2.json:ro
+      - ./xray/config_server2_hybrid.json:/etc/xray/config_server2_hybrid.json:ro
       - ./logs/xray:/logs/xray   # без ro, чтобы писать логи
     ports:
-      - "8443:8443"              # наружу пробрасываем порт для reality server2
+      - "8443:8443"              # наружу пробрасываем порт для клиентов server2
+      - "9443:9443"              # наружу пробрасываем порт для серверных подключений server2
 
   fastapi-server2:
     build:
@@ -21,7 +22,7 @@ services:
       - "8082:8081"              # наружу проброс API
     volumes:
       - ./app:/app/app
-      - ./xray/config_server2.json:/usr/local/etc/xray/config.json:ro
+      - ./xray/config_server2_hybrid.json:/usr/local/etc/xray/config.json:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - ./logs/xray:/logs/xray:ro
     environment:
