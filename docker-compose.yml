@@ -6,12 +6,13 @@ services:
     container_name: xray
     restart: unless-stopped
     volumes:
-      - ./xray/config.json:/etc/xray/config.json:ro
+      - ./xray/config_hybrid.json:/etc/xray/config.json:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - ./logs/xray:/logs/xray
     ports:
       - "80:80"
       - "443:443"
+      - "8443:8443"
 
   fastapi:
     build:
@@ -23,7 +24,7 @@ services:
     volumes:
       - ./app:/app/app
       - ./restart_xray.sh:/app/restart_xray.sh:rw
-      - ./xray/config.json:/usr/local/etc/xray/config.json:rw
+      - ./xray/config_hybrid.json:/usr/local/etc/xray/config.json:rw
       - /etc/systemd/system:/etc/systemd/system:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - ./logs/xray/access.log:/logs/xray/access.log:ro

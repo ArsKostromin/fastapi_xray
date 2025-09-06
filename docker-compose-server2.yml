@@ -10,7 +10,7 @@ services:
       - ./xray/config_server2.json:/etc/xray/config_server2.json:ro
       - ./logs/xray:/logs/xray   # без ro, чтобы писать логи
     ports:
-      - "8443:8443"              # наружу пробрасываем порт для reality
+      - "8443:8443"              # наружу пробрасываем порт для reality server2
 
   fastapi-server2:
     build:
