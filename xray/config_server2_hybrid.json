@@ -48,35 +48,6 @@
           "quic"
         ]
       }
-    },
-    {
-      "tag": "vless-server-server",
-      "port": 8443,
-      "listen": "0.0.0.0",
-      "protocol": "vless",
-      "settings": {
-        "clients": [
-          {
-            "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-            "level": 0,
-            "email": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          }
-        ],
-        "decryption": "none"
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "none"
-      }
-    },
-    {
-      "tag": "api",
-      "port": 10085,
-      "listen": "127.0.0.1",
-      "protocol": "dokodemo-door",
-      "settings": {
-        "address": "127.0.0.1"
-      }
     }
   ],
   "outbounds": [
@@ -118,13 +89,6 @@
     "rules": [
       {
         "type": "field",
-        "inboundTag": [
-          "api"
-        ],
-        "outboundTag": "api"
-      },
-      {
-        "type": "field",
         "ip": [
           "geoip:private"
         ],
@@ -134,13 +98,6 @@
         "type": "field",
         "inboundTag": [
           "reality-vless-double"
-        ],
-        "outboundTag": "direct"
-      },
-      {
-        "type": "field",
-        "inboundTag": [
-          "vless-server-server"
         ],
         "outboundTag": "direct"
       }
@@ -164,11 +121,5 @@
       "statsOutboundDownlink": true
     }
   },
-  "stats": {},
-  "api": {
-    "tag": "api",
-    "services": [
-      "StatsService"
-    ]
-  }
+  "stats": {}
 }
