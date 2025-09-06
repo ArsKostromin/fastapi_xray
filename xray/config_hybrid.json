@@ -101,9 +101,9 @@
       "settings": {
         "clients": [
           {
-            "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+            "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
             "level": 0,
-            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42"
+            "email": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
           }
         ],
         "decryption": "none"
@@ -134,9 +134,9 @@
             "port": 443,
             "users": [
               {
-                "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+                "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
                 "level": 0,
-                "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+                "email": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
                 "encryption": "none"
               }
             ]
