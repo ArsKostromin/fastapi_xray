@@ -159,7 +159,7 @@
         "inboundTag": [
           "reality-vless-double"
         ],
-        "outboundTag": "proxy-to-server1"
+        "outboundTag": "direct"
       },
       {
         "type": "field",
