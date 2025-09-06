@@ -131,7 +131,7 @@
         "vnext": [
           {
             "address": "176.97.71.56",
-            "port": 8443,
+            "port": 443,
             "users": [
               {
                 "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
