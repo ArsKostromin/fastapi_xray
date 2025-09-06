@@ -6,7 +6,7 @@
   },
   "inbounds": [
     {
-      "tag": "reality-vless-clients-server2",
+      "tag": "reality-vless-clients",
       "port": 443,
       "listen": "0.0.0.0",
       "protocol": "vless",
@@ -50,8 +50,8 @@
       }
     },
     {
-      "tag": "reality-vless-servers-server2",
-      "port": 9443,
+      "tag": "reality-vless-servers",
+      "port": 8443,
       "listen": "0.0.0.0",
       "protocol": "vless",
       "settings": {
@@ -94,8 +94,8 @@
       }
     },
     {
-      "tag": "api-server2",
-      "port": 10086,
+      "tag": "api",
+      "port": 10085,
       "listen": "127.0.0.1",
       "protocol": "dokodemo-door",
       "settings": {
@@ -117,8 +117,7 @@
                 "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
                 "level": 0,
                 "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
-                "encryption": "none",
-                "flow": "xtls-rprx-vision"
+                "encryption": "none"
               }
             ]
           }
@@ -144,9 +143,9 @@
       {
         "type": "field",
         "inboundTag": [
-          "api-server2"
+          "api"
         ],
-        "outboundTag": "api-server2"
+        "outboundTag": "api"
       },
       {
         "type": "field",
@@ -158,14 +157,14 @@
       {
         "type": "field",
         "inboundTag": [
-          "reality-vless-clients-server2"
+          "reality-vless-clients"
         ],
         "outboundTag": "proxy-to-server1"
       },
       {
         "type": "field",
         "inboundTag": [
-          "reality-vless-servers-server2"
+          "reality-vless-servers"
         ],
         "outboundTag": "direct"
       }
@@ -191,7 +190,7 @@
   },
   "stats": {},
   "api": {
-    "tag": "api-server2",
+    "tag": "api",
     "services": [
       "StatsService"
     ]

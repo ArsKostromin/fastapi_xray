@@ -6,8 +6,52 @@
   },
   "inbounds": [
     {
-      "tag": "reality-vless-clients",
+      "tag": "reality-vless-single",
       "port": 443,
+      "listen": "0.0.0.0",
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+            "level": 0,
+            "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+            "flow": "xtls-rprx-vision"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "www.cloudflare.com:443",
+          "xver": 0,
+          "serverNames": [
+            "www.cloudflare.com"
+          ],
+          "privateKey": "MKmOvMSCrWxf0ptC2s5cYpp-ddFcjNN2J8vDWcWtWGM",
+          "publicKey": "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY",
+          "shortIds": [
+            "f6213f68"
+          ],
+          "spiderX": "/"
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "routeOnly": false,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      }
+    },
+    {
+      "tag": "reality-vless-double",
+      "port": 8445,
       "listen": "0.0.0.0",
       "protocol": "vless",
       "settings": {
@@ -125,6 +169,43 @@
   ],
   "outbounds": [
     {
+      "tag": "proxy-to-japan",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "176.97.71.56",
+            "port": 8443,
+            "users": [
+              {
+                "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+                "level": 0,
+                "email": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "www.cloudflare.com:443",
+          "xver": 0,
+          "serverNames": [
+            "www.cloudflare.com"
+          ],
+          "publicKey": "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY",
+          "shortIds": [
+            "f6213f68"
+          ],
+          "spiderX": "/"
+        }
+      }
+    },
+    {
       "tag": "direct",
       "protocol": "freedom"
     },
@@ -153,9 +234,16 @@
       {
         "type": "field",
         "inboundTag": [
-          "reality-vless-clients"
+          "reality-vless-single"
         ],
         "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "inboundTag": [
+          "reality-vless-double"
+        ],
+        "outboundTag": "proxy-to-japan"
       },
       {
         "type": "field",
