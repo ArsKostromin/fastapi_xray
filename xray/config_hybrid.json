@@ -25,10 +25,10 @@
         "security": "reality",
         "realitySettings": {
           "show": false,
-          "dest": "google.com:443",
+          "dest": "www.cloudflare.com:443",
           "xver": 0,
           "serverNames": [
-            "google.com"
+            "www.cloudflare.com"
           ],
           "privateKey": "ULgTE4HMNHFOrS8qi1sE3hGWIgEgtSma1B0gcqav0k0",
           "publicKey": "PKR6cztS617vk7dRQmrIbFGIupBydHXpIIXyNALbsTU",
@@ -64,7 +64,7 @@
         "security": "reality",
         "realitySettings": {
           "fingerprint": "chrome",
-          "serverName": "google.com",
+          "serverName": "www.cloudflare.com",
           "publicKey": "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY",
           "shortId": "9b3a7d2e",
           "spiderX": "/"
