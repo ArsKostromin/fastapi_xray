@@ -27,10 +27,14 @@
           "show": false,
           "dest": "www.cloudflare.com:443",
           "xver": 0,
-          "serverNames": ["www.cloudflare.com"],
+          "serverNames": [
+            "www.cloudflare.com"
+          ],
           "privateKey": "ULgTE4HMNHFOrS8qi1sE3hGWIgEgtSma1B0gcqav0k0",
           "publicKey": "PKR6cztS617vk7dRQmrIbFGIupBydHXpIIXyNALbsTU",
-          "shortIds": ["f6213f68"],
+          "shortIds": [
+            "f6213f68"
+          ],
           "spiderX": "/"
         }
       }
@@ -60,12 +64,10 @@
         "security": "reality",
         "realitySettings": {
           "fingerprint": "chrome",
-          "serverNames": ["176.97.71.56"],
+          "serverName": "www.cloudflare.com",
           "publicKey": "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY",
-          "privateKey": "MKmOvMSCrWxf0ptC2s5cYpp-ddFcjNN2J8vDWcWtWGM",
           "shortId": "9b3a7d2e",
-          "spiderX": "/",
-          "dest": "176.97.71.56:443"
+          "spiderX": "/"
         }
       }
     },
