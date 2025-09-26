@@ -27,16 +27,50 @@
           "show": false,
           "dest": "www.cloudflare.com:443",
           "xver": 0,
-          "serverNames": ["www.cloudflare.com", "www.google.com"],
+          "serverNames": [
+            "www.cloudflare.com"
+          ],
           "privateKey": "ULgTE4HMNHFOrS8qi1sE3hGWIgEgtSma1B0gcqav0k0",
           "publicKey": "PKR6cztS617vk7dRQmrIbFGIupBydHXpIIXyNALbsTU",
-          "shortIds": ["f6213f68"],
+          "shortIds": [
+            "f6213f68"
+          ],
           "spiderX": "/"
         }
       }
     }
   ],
   "outbounds": [
+    {
+      "tag": "to-server1",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "176.97.71.56",
+            "port": 443,
+            "users": [
+              {
+                "id": "960f001f-d065-410e-8a0d-c8aa2af4fe42",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "fingerprint": "chrome",
+          "serverName": "www.cloudflare.com",
+          "publicKey": "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY",
+          "shortId": "9b3a7d2e",
+          "spiderX": "/"
+        }
+      }
+    },
     {
       "tag": "direct",
       "protocol": "freedom"
@@ -48,22 +82,6 @@
   ],
   "routing": {
     "domainStrategy": "AsIs",
-    "rules": [
-      {
-        "type": "field",
-        "outboundTag": "direct",
-        "domain": ["geosite:google"]
-      },
-      {
-        "type": "field",
-        "outboundTag": "direct",
-        "ip": ["geoip:private", "geoip:cn"]
-      },
-      {
-        "type": "field",
-        "outboundTag": "block",
-        "domain": ["geosite:category-ads-all"]
-      }
-    ]
+    "rules": []
   }
 }
