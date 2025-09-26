@@ -62,7 +62,7 @@
           "fingerprint": "chrome",
           "serverNames": ["www.cloudflare.com"],
           "publicKey": "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY",
-          "shortIds": "9b3a7d2e",
+          "shortIds": ["9b3a7d2e"], 
           "privateKey": "2RQG6tC5XWJ5XkR9nYF9hTzMhsQkzXcYlM7D0v9FhZs",
           "spiderX": "/",
           "dest": "176.97.71.56:443"
