@@ -67,7 +67,7 @@
           "serverNames": ["176.97.71.56"],
           "publicKey": "UticfTlXI8JBFnH9xE6MWWOicvlr9BF3I3uU5-rB8xY",
           "privateKey": "MKmOvMSCrWxf0ptC2s5cYpp-ddFcjNN2J8vDWcWtWGM",
-          "shortId": "9b3a7d2e",
+          "shortId": ["9b3a7d2e"],
           "spiderX": "/",
           "dest": "176.97.71.56:443"
         }
