@@ -100,7 +100,8 @@ class XrayLogTailer:
                         "timestamp": timestamp_iso,
                         "status": status_out,
                         "bytes_sent": bytes_sent,
-                        "server_ip": self.server_ip
+                        "server_ip": self.server_ip,
+                        "raw_log": f"{line} server_ip: {self.server_ip}"
                     }
 
                     print(f"📤 Отправляем лог: {payload}")
